@@ -1,44 +1,58 @@
 package com.hit.memoryunits;
 
 
-public class Page<T> extends java.lang.Object implements java.io.Serializable {
-	T m_Content;
-	java.lang.Long m_long;
-	java.lang.String m_string;
-	
-	
-	
-	public Page(java.lang.Long id, T content){
-		
+import java.io.Serializable;
+
+public class Page<T> extends java.lang.Object implements Serializable {
+	private T content;
+	private Long id;
+	private String string;
+
+
+	public Page(Long id, T content){
+		this.setId(id);
+		this.setContent(content);
 	}
-	
-	public boolean equals(java.lang.Object obj){
-		return true;
+
+	@Override
+	public boolean equals(Object obj){
+		if(this == obj) {
+			return true;
+		} else if(!(obj instanceof Page)) {
+			return false;
+		}
+
+		Page page = (Page) obj;
+
+		return page.getPageId() == id;
 	}
+
+
 	
-	
-	public java.lang.Long getPageId(){
-		return m_long;
+	public Long getPageId(){
+		return id;
 	}
-	
+
+	@Override
 	public int hashCode(){
-		return 0;
+		return id.intValue();
 	}
 	
 	public void setContent(T content){
-		
+		this.content = content;
 	}
 	
 	public T getContent(){
-		return m_Content;
+		return content;
 	}
 	
-	public void setPageId(Long pageId){
-		
+	public void setId(Long id){
+		this.id = id;
 	}
-	
-	public java.lang.String toString(){
-		return m_string;
+
+	@Override
+	public String toString(){
+		return string;
 	}
 
 }
