@@ -3,7 +3,7 @@ package com.hit.memoryunits;
 
 import java.io.Serializable;
 
-public class Page<T> extends java.lang.Object implements Serializable {
+public class Page<T> implements Serializable {
 	private T content;
 	private Long id;
 	private String string;
@@ -51,8 +51,7 @@ public class Page<T> extends java.lang.Object implements Serializable {
 	}
 
 	@Override
-	public String toString(){
-		return string;
+	public String toString() {
+		return "(" + id + "," + content.toString() + ")";
 	}
-
 }
