@@ -1,1 +1,2 @@
 What to do with Page->hashCode() override?
+For Aviad: Check my Page->equals method.
