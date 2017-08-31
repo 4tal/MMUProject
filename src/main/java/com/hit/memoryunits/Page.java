@@ -1,30 +1,29 @@
 package com.hit.memoryunits;
 
 
-import java.io.Serializable;
-
-public class Page<T> implements Serializable {
+public class Page<T> implements java.io.Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private T content;
 	private Long id;
-	private String string;
 
 
-	public Page(Long id, T content){
+	public Page(java.lang.Long id, T content){
 		this.setId(id);
 		this.setContent(content);
 	}
 
 	@Override
 	public boolean equals(Object obj){
-		if(this == obj) {
+		if(this == obj) 
+		{
 			return true;
-		} else if(!(obj instanceof Page)) {
-			return false;
-		}
+		} 
+		return false;
 
-		Page page = (Page) obj;
-
-		return page.getPageId() == id;
 	}
 
 
