@@ -11,7 +11,7 @@ public class RAM implements Serializable{
 
 	public RAM(int initialCapacity){
 		setInitialCapacity(initialCapacity);
-		pages = new LinkedHashMap<>();
+		pages = new LinkedHashMap<Long,Page<byte[]>>();
 	}
 
 	public void addPage(Page<byte[]> addPage){
@@ -61,4 +61,5 @@ public class RAM implements Serializable{
 	public void setPages(Map<Long,Page<byte[]>> pages){
 		this.pages = pages;
 	}
+	
 }

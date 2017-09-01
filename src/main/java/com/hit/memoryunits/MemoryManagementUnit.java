@@ -8,12 +8,12 @@ public class MemoryManagementUnit extends java.lang.Object{
 
 
 	//Check the parameters:
-	public MemoryManagementUnit(int ramCapacity, IAlgoCache<java.lang.Long,java.lang.Long> algo){
+	public MemoryManagementUnit(int ramCapacity, com.hit.algorithm.IAlgoCache<java.lang.Long,java.lang.Long> algo){
 
 	}
 
 	/*     Need to complete this method.
-	public Page<byte[]>[] getPages(Long[] pageIds){
+	public Page<byte[]>[] getPages(java.lang.Long[] pageIds){
 	}
 
 	*/
