@@ -1,2 +1,5 @@
 What to do with Page->hashCode() override?
+you can just return ID.IntValue()
+
 For Aviad: Check my Page->equals method.
+I added the missing part.
