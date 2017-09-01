@@ -21,9 +21,15 @@ public class Page<T> implements java.io.Serializable {
 		if(this == obj) 
 		{
 			return true;
-		} 
-		return false;
+		}
 
+		if(!(obj instanceof Page)){
+			return false;
+		}
+
+		Page page = (Page) obj;
+
+		return page.getPageId() == this.id;
 	}
 
 
