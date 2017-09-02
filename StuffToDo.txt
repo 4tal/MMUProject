@@ -1,5 +1,10 @@
+Added testing for RAM Class.
+Needs to clean RAM Class, maybe to add another function to getPages();
+
+====================Finished==========================
+
 What to do with Page->hashCode() override?
 you can just return ID.IntValue()
 
 For Aviad: Check my Page->equals method.
-I added the missing part.
+I added the missing part
