@@ -1,5 +1,7 @@
 package com.hit.memoryunits;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,19 +23,36 @@ public class MemoryManagementUnit extends java.lang.Object{
 
 	}
 
-	public Page<byte[]>[] getPages(java.lang.Long[] pageIds){
-		List<Page<byte[]>> returnedPages=new ArrayList<Page<byte[]>>();
+	public Page<byte[]>[] getPages(java.lang.Long[] pageIds) throws FileNotFoundException, IOException{
+		HardDisk hardDiskInstance=HardDisk.getInstance();
+		
+		List<Page<byte[]>> pagesFromRam=new ArrayList<Page<byte[]>>();
+		List<Page<byte[]>> pagesFromHD=new ArrayList<Page<byte[]>>();
+		List<Long> notInRam=new ArrayList<Long>();
 		for(int i=0;i<pageIds.length;i++)
 		{
 			if(this.ram.getPage(pageIds[i])!=null)
 			{
-				returnedPages.add(this.ram.getPage(pageIds[i]));
+				pagesFromRam.add(this.ram.getPage(pageIds[i]));
 			}
 			else
 			{
-				//Add Logic for what to do when the page is not in the RAM;
+				notInRam.add(pageIds[i]);
 			}
 		}
+		
+		for(int i=0;i<notInRam.size();i++)
+		{
+			pagesFromHD.add(hardDiskInstance.pageFault(notInRam.get(i)));//Get the pages from HD to RAM
+		}
+		
+		//Page<byte[]>[] listOfPagesToReturn=new Page<byte[]>[pagesFromRam.size()+pagesFromHD.size()]; 
+		
+		//Remove RAM (Capacity-Not in Ram) pages.
+		
+		//Add function that copy the pages from both of the list to Page Array;
+		
+		
 		return this.getPages(pageIds);
 	}
 
