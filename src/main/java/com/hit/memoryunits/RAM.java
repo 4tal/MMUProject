@@ -8,13 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 public class RAM implements Serializable{
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 	private int initialCapacity;
 	//need to change it to private:
-	public Map<Long, Page<byte[]>> pages;
+	private Map<Long, Page<byte[]>> pages;
 
 	public RAM(int initialCapacity){
 		setInitialCapacity(initialCapacity);
@@ -64,7 +62,7 @@ public class RAM implements Serializable{
 		return returnPages;
 	}
 	
-	public int getMapSize()
+	public int getRamSize()
 	{
 		return this.pages.size();
 	}
