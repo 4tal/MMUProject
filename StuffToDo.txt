@@ -1,6 +1,19 @@
 Added testing for RAM Class.
 Needs to clean RAM Class, maybe to add another function to getPages();
 
+In HD class do we need to add finally?
+Add write/Read Data from file test function.
+
+When we'll delete files from the HD???
+
+In CheckPageFault there is a line in comment that suppose to run - Don't know why it isn't.
+
+Check Exceptions all over the project.
+
+need to Finish test for HD, MMU
+
+Need to finish MMU class.
+
 ====================Finished==========================
 
 What to do with Page->hashCode() override?

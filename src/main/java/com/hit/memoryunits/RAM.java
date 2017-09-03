@@ -49,6 +49,7 @@ public class RAM implements Serializable{
 				returnedPages.add(this.getPage(pageIds[i]));
 				//returnedPages.add(pages.get(pageIds[i]));
 			}
+			//returnedPages.add(this.)
 			//returnPages[i] = pages.get(pageIds[i]);
 		}
 		
@@ -62,7 +63,7 @@ public class RAM implements Serializable{
 		return returnPages;
 	}
 	
-	public int getRamSize()
+	public int getRAMSize()
 	{
 		return this.pages.size();
 	}
