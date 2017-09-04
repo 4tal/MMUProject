@@ -19,10 +19,15 @@ public class MemoryManagementUnit extends java.lang.Object{
 	//Check the parameters:
 	public MemoryManagementUnit(int ramCapacity, com.hit.algorithm.IAlgoCache<java.lang.Long,java.lang.Long> algo){
 		ram=new RAM(ramCapacity);
-		cachingStrategy=(IAlgoCache) algo;
+		cachingStrategy=(IAlgoCache<Long, Long>) algo;
+		
+		//Go on all the documentation and make sure it's same.
 
 	}
 
+	//The MMU "asks" all this pages (From the RAM).
+	//If not all pages on RAM -> go To Get It from HD.
+	//
 	public Page<byte[]>[] getPages(java.lang.Long[] pageIds) throws FileNotFoundException, IOException{
 		HardDisk hardDiskInstance=HardDisk.getInstance();
 		
@@ -33,6 +38,7 @@ public class MemoryManagementUnit extends java.lang.Object{
 		{
 			if(this.ram.getPage(pageIds[i])!=null)
 			{
+				cachingStrategy.getElement(pageIds[i]);
 				pagesFromRam.add(this.ram.getPage(pageIds[i]));
 			}
 			else
