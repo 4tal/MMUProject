@@ -83,5 +83,4 @@ public class RAM implements Serializable{
 	public void setPages(Map<Long,Page<byte[]>> pages){
 		this.pages = pages;
 	}
-	
 }

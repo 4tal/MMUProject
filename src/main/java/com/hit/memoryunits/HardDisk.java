@@ -17,7 +17,7 @@ public final class HardDisk {
 	private static final int SIZE = 1000;
 	private static final String DEAFAULT_FILE_NAME = "lib/tempHD.txt"; //TODO the file name where the pages will be saved
 
-	private static HardDisk instance = null;
+	private static HardDisk instance = new HardDisk();
 	public HashMap<Long,Page<byte[]>> pagesOnHD;
 	
 	//Need to add try and catch;
@@ -27,19 +27,8 @@ public final class HardDisk {
 		this.pagesOnHD = new HashMap<Long,Page<byte[]>>();
 		readDataFromHD();
 	}
-
-	/**
-	 * This method is called when a page is not in fast memory (RAM)
-	 * @param pageId given Page id
-	 * @return the page with the given pageId
-	 * @throws FileNotFoundException indicates problem while getting the txt file where the pages saved
-	 * @throws IOException
-	 */
 	
 	public static HardDisk getInstance() {
-		if(instance == null) {
-			instance = new HardDisk();
-		}
 		return instance;
 	}
 	
@@ -63,6 +52,7 @@ public final class HardDisk {
 	 * @return the page with the given pageId
 	 * @throws FileNotFoundException indicates problem while getting the txt file where the pages saved
 	 * @throws IOException
+	 * @throws FileNotFoundException indicates problems read from files that behave like HD
 	 */
 	public Page<byte[]> pageReplacement(Page<byte[]> moveToHdPage, Long moveToRamId) throws FileNotFoundException, IOException{
 		//TODO Complete implementation
@@ -71,7 +61,7 @@ public final class HardDisk {
 		return pagesOnHD.get(moveToRamId);
 	}
 
-	public void readDataFromHD()
+	private void readDataFromHD()
 	{
 		Page<byte[]> obj;
 	//	System.out.println("A");
@@ -155,15 +145,12 @@ public final class HardDisk {
 		
 	}
 	
-	public void writeDataToHD()
+	private void writeDataToHD()
 	{
-		FileOutputStream fout = null;
-		ObjectOutputStream oos = null;
-		
-		try{
-			fout = new FileOutputStream(DEAFAULT_FILE_NAME);
-			oos = new ObjectOutputStream(fout);
-		
+		//this line called "try with resources"- it's in java 7, it also do for you the "finally{ fout.close(); oos.close()}"
+		try(FileOutputStream fout = new FileOutputStream(DEAFAULT_FILE_NAME);
+			ObjectOutputStream oos = new ObjectOutputStream(fout);)
+		{
 			//HashMap<Long, byte[]> selects = new HashMap<Long, byte[]>();
 
 		
@@ -177,29 +164,6 @@ public final class HardDisk {
 		{
 			ex.printStackTrace();
 		}
-		
-		//Do we need to do finally?
-		/*
-		finally {
-
-			if (fout != null) {
-				try {
-					fout.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-
-			if (oos != null) {
-				try {
-					oos.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-
-		}
-		*/
 	}
 	
 
