@@ -1,47 +1,45 @@
 package com.hit.memoryunits;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.HashMap;
+import com.hit.memoryunits.streams.HardDiskReader;
+import com.hit.memoryunits.streams.HardDiskWriter;
+
+import java.io.*;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class HardDisk {
 
 	private static final int SIZE = 1000;
-	private static final String DEAFAULT_FILE_NAME = "lib/tempHD.txt"; //TODO the file name where the pages will be saved
-
-	private static HardDisk instance = new HardDisk();
-	public HashMap<Long,Page<byte[]>> pagesOnHD;
+	private static final String DEAFAULT_FILE_NAME = "lib/tempHD.txt"; //TODO should be in path "src/main/resources/<filename>.txt"
+	private boolean firstRead;
+	private static final HardDisk instance = new HardDisk();
+	public Map<Long,Page<byte[]>> pagesOnHD;
 	
-	//Need to add try and catch;
-
 
 	private HardDisk() {
-		this.pagesOnHD = new HashMap<Long,Page<byte[]>>();
-		readDataFromHD();
+		//TODO we need to write some dummy elements to the HD
+		this.pagesOnHD = new LinkedHashMap<>(SIZE);
+		firstRead = true;
 	}
 	
 	public static HardDisk getInstance() {
 		return instance;
 	}
-	
-	public Page<byte[]> pageFault(Long pageId) throws FileNotFoundException, IOException{
-		if(pagesOnHD==null){
-			throw new IOException();
-		}
-		
-		if(pagesOnHD.get(pageId)!=null){
+
+	/**
+	 * This method is called when a page is not in fast memory (RAM)
+	 * @param pageId given pageId
+	 * @return the page with the given pageId
+	 * @throws FileNotFoundException indicates problems accessing the HD(the file)
+	 * @throws IOException indicates problems accessing the HD
+	 */
+	public Page<byte[]> pageFault(Long pageId) throws FileNotFoundException, IOException {
+		if(pagesOnHD.containsKey(pageId)){
+			writeToHD();
 			return pagesOnHD.get(pageId);
 		}
+
 		return null;
-		
 	}
 	
 	/**
@@ -55,117 +53,29 @@ public final class HardDisk {
 	 * @throws FileNotFoundException indicates problems read from files that behave like HD
 	 */
 	public Page<byte[]> pageReplacement(Page<byte[]> moveToHdPage, Long moveToRamId) throws FileNotFoundException, IOException{
-		//TODO Complete implementation
 		pagesOnHD.put(moveToHdPage.getPageId(), moveToHdPage);
+
+		if (pageFault(moveToRamId) != null) {
+			return pageFault(moveToRamId);
+		}
+
+		writeToHD();
 		
-		return pagesOnHD.get(moveToRamId);
+		return null;
 	}
 
-	private void readDataFromHD()
-	{
-		Page<byte[]> obj;
-	//	System.out.println("A");
-		boolean continueToRead=true;
-		FileInputStream fin = null;
-		ObjectInputStream ois = null;
-		//System.out.println("A");
-		try {
-			//We can move it to other function
-			File file = new File(DEAFAULT_FILE_NAME);
-			//System.out.println("A");
-			if(file.length() == 0)
-			{
-				//System.out.println("B");
-				continueToRead=false;
-			}
-			else
-			{
-				//System.out.println("c");
-				fin = new FileInputStream(file);
-				//System.out.println("A");
-				ois = new ObjectInputStream(fin); 
-				//System.out.println("c");
-				
-			}
-			
-		
-			//=====================================================================================
-			  
-			
-			while(continueToRead)
-			{
-				
-				
-				//System.out.println("111");
-				obj = (Page<byte[]>) ois.readObject();
-				
-				//System.out.println(file.length());
-				//System.out.println("d");
-				if(obj!=null)
-				{
-					//System.out.println(obj.getPageId());
-					
-					this.pagesOnHD.put(obj.getPageId(), obj);
-					//System.out.println(pagesOnHD.size());
-				}
-				else
-				{
-					continueToRead = false;
-				}
-				
-			}	
-			//System.out.println("e");
-
-		} 
-		catch (Exception ex) 
-		{
-			System.out.println("in Exe");
-			//ex.printStackTrace();
-		}
-		/*finally {
-
-			if (fin != null) {
-				try {
-					fin.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-
-			if (ois != null) {
-				try {
-					ois.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-
-		}
-		*/
-		
+	private void writeToHD() throws FileNotFoundException, IOException {
+		HardDiskWriter hardDiskWriter = new HardDiskWriter(new ObjectOutputStream(new FileOutputStream(DEAFAULT_FILE_NAME)));
+		hardDiskWriter.writeAll(pagesOnHD);
 	}
-	
-	private void writeDataToHD()
-	{
-		//this line called "try with resources"- it's in java 7, it also do for you the "finally{ fout.close(); oos.close()}"
-		try(FileOutputStream fout = new FileOutputStream(DEAFAULT_FILE_NAME);
-			ObjectOutputStream oos = new ObjectOutputStream(fout);)
-		{
-			//HashMap<Long, byte[]> selects = new HashMap<Long, byte[]>();
 
-		
-			for(Map.Entry<Long,Page<byte[]>> entry : this.pagesOnHD.entrySet()) 
-			{
-				Page<byte[]> value = entry.getValue();
-				oos.writeObject(value);
-			}
-		}
-		catch(Exception ex)
-		{
-			ex.printStackTrace();
+	private void readFromHD()  throws FileNotFoundException, IOException{
+		if (firstRead) {
+			HardDiskReader hardDiskReader = new HardDiskReader(new ObjectInputStream(new FileInputStream(DEAFAULT_FILE_NAME)));
+			pagesOnHD = hardDiskReader.readAll();
+			firstRead = false;
 		}
 	}
-	
 
 	//when clone method is override the singleton is more stronger because the singleton object(HardDisk) cannot be cloned
 	@Override

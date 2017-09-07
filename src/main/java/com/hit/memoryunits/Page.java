@@ -19,6 +19,9 @@ public class Page<T> implements java.io.Serializable {
 		this.setContent(content);
 	}
 
+	public Page() {
+	}
+
 	/**
 	 *
 	 * @param obj the object to compare
