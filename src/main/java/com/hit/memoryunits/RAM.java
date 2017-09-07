@@ -11,80 +11,95 @@ public class RAM implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	private int initialCapacity;
-	
-	//need to change it to private:
-	//==============================================================================
-	//Make sure that the ram don't pass it's initial capacity.
-	
+
 	private Map<Long, Page<byte[]>> pages;
 
 	public RAM(int initialCapacity){
 		setInitialCapacity(initialCapacity);
-		pages = new LinkedHashMap<Long,Page<byte[]>>();
+		setPages(new LinkedHashMap<Long,Page<byte[]>>());
 	}
 
+	/**
+	 *
+	 * @param inputPage the page that will be added
+	 */
 	public void addPage(Page<byte[]> inputPage){
 		pages.put(inputPage.getPageId(), inputPage);
 	}
+
+	/**
+	 * added all pages at once
+	 * @param addPages the pages that will be added
+	 */
 	public void addPages(Page<byte[]>[] addPages){
 		for (Page<byte[]> addPage : addPages) {
 			pages.put(addPage.getPageId(), addPage);
 		}
 	}
-	
+
 	public int getInitialCapacity(){
-		return initialCapacity;
+		return this.initialCapacity;
 	}
-	
+
+	/**
+	 * get Page by id
+	 * @param pageId the id of the wanted Page
+	 * @return the Page that matches the id
+	 */
 	public Page<byte[]> getPage(Long pageId){
 		return pages.get(pageId);
 	}
+
+	/**
+	 * get all the pages
+	 * @return all the pages
+	 */
 	public Map<Long,Page<byte[]>> getPages(){
 		return pages;
 	}
-	
+
+	/**
+	 * get multiple pages at once by array of id's
+	 * @param pageIds the given id's
+	 * @return all the pages that matches the id's
+	 */
 	public Page<byte[]>[] getPages(Long[] pageIds){
-		//Added step first add to array list (only if exist), than to Page<byte[]>
-		List<Page<byte[]>> returnedPages=new ArrayList<Page<byte[]>>();
-		for(int i = 0; i < pageIds.length; i++)
-		{
-			if(pages.get(pageIds[i])!=null)
-			{
-				returnedPages.add(this.getPage(pageIds[i]));
-				//returnedPages.add(pages.get(pageIds[i]));
-			}
-			//returnedPages.add(this.)
-			//returnPages[i] = pages.get(pageIds[i]);
-		}
-		
-		Page<byte[]>[] returnPages = new Page[returnedPages.size()];
-		
-		for(int i=0;i<returnedPages.size();i++)
-		{
-			returnPages[i]=(Page<byte[]>) returnedPages.get(i);
+		Page<byte[]>[] pagesResult = new Page[pageIds.length];
+
+		for (int i = 0; i < pageIds.length; i++) {
+			pagesResult[i] = pages.get(pageIds[i]);
 		}
 
-		return returnPages;
+		return pagesResult;
 	}
-	
-	public int getRAMSize()
-	{
-		return this.pages.size();
-	}
-	
+
+	/**
+	 * remove specific Page
+	 * @param removePage the Page to remove
+	 */
 	public void removePage(Page<byte[]> removePage){
 		pages.remove(removePage.getPageId());
 	}
+
+	/**
+	 * remove bunch of Pages at once
+	 * @param removePages the Pages to remove
+	 */
 	public void removePages(Page<byte[]>[] removePages) {
 		for (Page<byte[]> removePage : removePages) {
 			pages.remove(removePage.getPageId());
 		}
 	}
+
 	public void setInitialCapacity(int initialCapacity){
 		this.initialCapacity = initialCapacity;
 	}
 
 	public void setPages(Map<Long,Page<byte[]>> pages){
 		this.pages = pages;
+	}
+
+	public int getRAMSize() {
+		return pages.size();
 	}
 }

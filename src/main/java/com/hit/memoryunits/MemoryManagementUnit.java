@@ -18,7 +18,6 @@ public class MemoryManagementUnit{
 	private IAlgoCache<Long, Long> algo;
 	private HardDisk hardDisk;
 
-	//Check the parameters:
 	public MemoryManagementUnit(int ramCapacity, IAlgoCache<Long, Long> algo){
 		setRam(new RAM(ramCapacity));
 		setAlgo(algo);
@@ -48,6 +47,7 @@ public class MemoryManagementUnit{
 					pagesResult[i] = ram.getPage(pageIds[i]);
 				}
 			} else if (hardDisk.pageFault(pageIds[i]) != null) { //ram is full then replace the page
+
 				long id = algo.putElement(pageIds[i], pageIds[i]);
 				Page<byte[]> removedPage;
 				removedPage = ram.getPage(id);
