@@ -14,14 +14,14 @@ public final class HardDisk {
 	private boolean firstRead;
 	private static final HardDisk instance = new HardDisk();
 	public Map<Long,Page<byte[]>> pagesOnHD;
-	
+
 
 	private HardDisk() {
 		//TODO we need to write some dummy elements to the HD
 		this.pagesOnHD = new LinkedHashMap<>(SIZE);
 		firstRead = true;
 	}
-	
+
 	public static HardDisk getInstance() {
 		return instance;
 	}
@@ -41,7 +41,7 @@ public final class HardDisk {
 
 		return null;
 	}
-	
+
 	/**
 	 * This method is called when a page is not in fast memory (RAM) and RAM is also with full capacity
 
@@ -60,7 +60,7 @@ public final class HardDisk {
 		}
 
 		writeToHD();
-		
+
 		return null;
 	}
 
