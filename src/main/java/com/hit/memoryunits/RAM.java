@@ -11,7 +11,11 @@ public class RAM implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	private int initialCapacity;
+	
 	//need to change it to private:
+	//==============================================================================
+	//Make sure that the ram don't pass it's initial capacity.
+	
 	private Map<Long, Page<byte[]>> pages;
 
 	public RAM(int initialCapacity){
