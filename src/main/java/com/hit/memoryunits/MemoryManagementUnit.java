@@ -60,27 +60,23 @@ public class MemoryManagementUnit{
 		return pagesResult;
 	}
 
-	public RAM getRam() {
+	private RAM getRam() {
 		return ram;
 	}
 
-	public void setRam(RAM ram) {
+	private void setRam(RAM ram) {
 		this.ram = ram;
 	}
 
-	public IAlgoCache<Long, Long> getAlgo() {
-		return algo;
-	}
-
-	public void setAlgo(IAlgoCache<Long, Long> algo) {
+	private void setAlgo(IAlgoCache<Long, Long> algo) {
 		this.algo = algo;
 	}
 
-	public HardDisk getHardDisk() {
+	private HardDisk getHardDisk() {
 		return hardDisk;
 	}
 
-	public void setHardDisk(HardDisk hardDisk) {
+	private void setHardDisk(HardDisk hardDisk) {
 		this.hardDisk = hardDisk;
 	}
 }
