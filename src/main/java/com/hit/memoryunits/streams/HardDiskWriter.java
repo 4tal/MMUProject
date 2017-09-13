@@ -17,7 +17,7 @@ public class HardDiskWriter implements Closeable {
 	public boolean writeAll(Map<Long, Page<byte[]>> pages) throws IOException {
 		boolean isSucceed = false;
 		//try with resources automatically do "finally close"
-		try (outputStream) {
+		try{
 			for (Page<byte[]> pageToWrite : pages.values()) {
 				outputStream.writeObject(pageToWrite);
 			}
@@ -27,6 +27,7 @@ public class HardDiskWriter implements Closeable {
 			isSucceed = false;
 			e.printStackTrace();
 		} finally {
+			outputStream.close();
 			return isSucceed;
 		}
 	}

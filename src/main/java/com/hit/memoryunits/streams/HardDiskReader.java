@@ -20,8 +20,7 @@ public class HardDiskReader implements Closeable{
 		Map<Long, Page<byte[]>> pages = new LinkedHashMap<>();
 		Page<byte[]> page = new Page<>();
 
-		//try with resources automatically do "final-close"
-		try (inputStream) {
+		try{
 			boolean toContinue = true;
 			while (toContinue) {
 				page = (Page<byte[]>) inputStream.readObject();
@@ -29,6 +28,8 @@ public class HardDiskReader implements Closeable{
 			}
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
+		} finally {
+			inputStream.close();
 		}
 
 		return pages;

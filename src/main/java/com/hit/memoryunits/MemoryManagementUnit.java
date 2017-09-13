@@ -30,7 +30,7 @@ public class MemoryManagementUnit{
 	 * @throws FileNotFoundException indicates problems reading from HD(file)
 	 * @throws IOException indicated problems reading from HD
 	 */
-	public synchronized Page<byte[]>[] getPages(Long[] pageIds) throws FileNotFoundException, IOException{
+	public synchronized Page<byte[]>[] getPages(Long[] pageIds) throws IOException{
 
 		Page<byte[]>[] pagesResult = new Page[pageIds.length];
 		hardDisk = HardDisk.getInstance();
