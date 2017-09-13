@@ -51,15 +51,13 @@ public class MMUTest {
 		assertEquals(page4.getPageId(), mmuPages[3].getPageId());
 		assertEquals(page5.getPageId(), mmuPages[4].getPageId());
 
-		/*
-		Assert.assertEquals(page2, mmuPages[1]);
-		Assert.assertEquals(page3, mmuPages[2]);
-		Assert.assertEquals(page4, mmuPages[3]);
-		Assert.assertEquals(page5, mmuPages[4]);
+		Page<byte[]>[] mmuPage;
+		Long[] id = new Long[1];
+		id[0] = 1500L;
+		mmuPage = mmu.getPages(id);
 
-		for (Page<byte[]> page : mmuPages) {
-			System.out.println(page.getContent());
-		}*/
+		//this page does not exist should return null
+		assertEquals(null, mmuPage[0]);
 
 	}
 }
