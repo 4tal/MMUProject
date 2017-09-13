@@ -67,7 +67,7 @@ public final class HardDisk {
 	public Page<byte[]> pageReplacement(Page<byte[]> moveToHdPage, Long moveToRamId) throws FileNotFoundException, IOException{
 		//TODO Complete implementation
 		pagesOnHD.put(moveToHdPage.getPageId(), moveToHdPage);
-		
+		//Maybe remove from HD the page that goes to ram???
 		return pagesOnHD.get(moveToRamId);
 	}
 
