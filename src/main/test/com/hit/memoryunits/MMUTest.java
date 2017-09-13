@@ -1,6 +1,7 @@
 package com.hit.memoryunits;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -44,8 +45,11 @@ public class MMUTest {
 
 		mmuPages = mmu.getPages(ids);
 
-		System.out.println("+++++++++++++++");
-		System.out.println(page1.getPageId() + "    " + mmuPages[0].getPageId());
+		assertEquals(page1.getPageId(), mmuPages[0].getPageId());
+		assertEquals(page2.getPageId(), mmuPages[1].getPageId());
+		assertEquals(page3.getPageId(), mmuPages[2].getPageId());
+		assertEquals(page4.getPageId(), mmuPages[3].getPageId());
+		assertEquals(page5.getPageId(), mmuPages[4].getPageId());
 
 		/*
 		Assert.assertEquals(page2, mmuPages[1]);

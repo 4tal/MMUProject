@@ -45,6 +45,12 @@ public final class HardDisk {
 		pagesOnHD.put(ids[3], page4);
 		pagesOnHD.put(ids[4], page5);
 
+		byte[] somePage = {1, 2, 1, 2, 1, 2};
+
+		for (int i = 5; i < SIZE; i++) {
+			pagesOnHD.put((long) i, new Page<byte[]>((long) i, somePage.clone()));
+		}
+
 		firstRead = true;
 	}
 
@@ -61,7 +67,7 @@ public final class HardDisk {
 	 */
 	public Page<byte[]> pageFault(Long pageId) throws FileNotFoundException, IOException {
 		if(pagesOnHD.containsKey(pageId)){
-			writeToHD();
+//			writeToHD();
 			return pagesOnHD.get(pageId);
 		}
 
@@ -85,7 +91,7 @@ public final class HardDisk {
 			return pageFault(moveToRamId);
 		}
 
-		writeToHD();
+//		writeToHD();
 
 		return null;
 	}
@@ -93,6 +99,7 @@ public final class HardDisk {
 	private void writeToHD() throws FileNotFoundException, IOException {
 		HardDiskWriter hardDiskWriter = new HardDiskWriter(new ObjectOutputStream(new FileOutputStream(DEAFAULT_FILE_NAME)));
 		hardDiskWriter.writeAll(pagesOnHD);
+		hardDiskWriter.close();
 	}
 
 	private void readFromHD()  throws FileNotFoundException, IOException{
@@ -100,6 +107,7 @@ public final class HardDisk {
 			HardDiskReader hardDiskReader = new HardDiskReader(new ObjectInputStream(new FileInputStream(DEAFAULT_FILE_NAME)));
 			pagesOnHD = hardDiskReader.readAll();
 			firstRead = false;
+			hardDiskReader.close();
 		}
 	}
 

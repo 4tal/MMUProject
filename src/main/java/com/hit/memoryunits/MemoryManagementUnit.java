@@ -11,8 +11,6 @@ import com.hit.algorithms.IAlgoCache;
  * This class represents the MMU - Hardware device that maps virtual to physical address by software
  */
 public class MemoryManagementUnit{
-	//Add 2 members RAM and IAlgoCache
-	//Add capability to read/Write from HD.
 
 	private RAM ram;
 	private IAlgoCache<Long, Long> algo;
