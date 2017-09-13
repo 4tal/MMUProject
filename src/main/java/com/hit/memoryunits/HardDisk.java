@@ -1,7 +1,7 @@
 package com.hit.memoryunits;
 
-import com.hit.memoryunits.streams.HardDiskReader;
-import com.hit.memoryunits.streams.HardDiskWriter;
+import streams.HardDiskReader;
+import streams.HardDiskWriter;
 
 import java.io.*;
 import java.util.LinkedHashMap;

@@ -1,4 +1,4 @@
-package com.hit.memoryunits.streams;
+package streams;
 
 import com.hit.memoryunits.Page;
 
