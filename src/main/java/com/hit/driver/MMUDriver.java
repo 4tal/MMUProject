@@ -84,14 +84,15 @@ public class MMUDriver {
 		}
 		
 		public static void runProcesses(List<Process> applications) throws InterruptedException, ExecutionException {
-			ExecutorService executor = Executors.newCachedThreadPool();
+			ExecutorService executorService = Executors.newCachedThreadPool();
 			
 			@SuppressWarnings("unchecked")
 			Future<Boolean> futures[] = new Future[applications.size()];
 			for (int i=0; i<applications.size(); i++){
-				futures[i] = executor.submit(applications.get(i));
+				futures[i] = executorService.submit(applications.get(i));
 			}
-			executor.shutdown();
+			
+			executorService.shutdown();
 			for (int i=0; i<applications.size(); i++){
 				System.out.printf("process %d: %s",applications.get(i).getId(),futures[i].get());
 			}

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.Scanner;
 
 public class CLI extends Object implements Runnable {
@@ -17,63 +18,60 @@ public class CLI extends Object implements Runnable {
 	
 	
 	
-	private InputStream inputFromUser;
-	private OutputStream outputToUser;
+	private Scanner in;
+	private PrintWriter out;
 	private OutputStreamWriter outputToUserWR;
 	
 	
-	public CLI(InputStream in,
-	           OutputStream out)
+	public CLI(InputStream in, OutputStream out)
 	{
-		inputFromUser=in;
-		outputToUser=out;
+		this.in = new Scanner(in);
+		this.out = new PrintWriter(out);
 	}
 	
 	
 	@Override
 	public void run() {
 		boolean programRunning=true;
-		Scanner reader=new Scanner(System.in);
 		
-		String input =reader.nextLine();
-		while(!(input.matches(START)))
+		
+		String input = in.nextLine();
+		while(!(input.toUpperCase().matches(START)))
 		{
 			//Case input is not valid.
-			System.out.println("Not a valid command");
-			input =reader.nextLine();
+			write("Not a valid command");
+			input = in.nextLine();
 		}
 		
-		System.out.println("Please enter required algorithm and RAM capacity");
-		input =reader.nextLine();
+		write("Please enter required algorithm and RAM capacity");
+		input = in.nextLine();
 		
 		while(programRunning){
-			while(!((input.matches("(LRU|NFU|RANDOM)\\s\\d+")) || (input.matches(STOP))))
+			while(!((input.toUpperCase().matches("(LRU|NFU|RANDOM)\\s\\d+")) || (input.matches(STOP))))
 			{
 				//Case input is not valid.
-				System.out.println("Not a valid command");
-				input =reader.nextLine();
+				write("Not a valid command");
+				input = in.nextLine();
 			}
 			
 			if(input.matches("STOP")){
 				//Case user want to quit
 				//Need to add exit logic
-				System.out.println("Stop");
+				write("Stop");
 				programRunning=false;
 			}
 			
 			//Logic for 
-			System.out.println("Not stop");
-			input =reader.nextLine();
+			write("Not stop");
+			input = in.nextLine();
 		}
-		
-		
-		// TODO Auto-generated method stub
 		
 	}
 	
-	public void write(java.lang.String string)
+	public void write(String string)
 	{
-		
+		out.println(string);
+		out.flush();
 	}
 	
 }
