@@ -7,28 +7,26 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
-public class HardDiskWriter implements Closeable {
+public class HardDiskWriter extends ObjectOutputStream {
 	private final ObjectOutputStream outputStream;
 
-	public HardDiskWriter(ObjectOutputStream outputStream) {
+	public HardDiskWriter(ObjectOutputStream outputStream) throws IOException {
 		this.outputStream = outputStream;
 	}
 
-	public boolean writeAll(Map<Long, Page<byte[]>> pages) throws IOException {
-		boolean isSucceed = false;
-		//try with resources automatically do "finally close"
+	public void writeAll(Map<Long, Page<byte[]>> pages) throws IOException {
 		try{
 			for (Page<byte[]> pageToWrite : pages.values()) {
 				outputStream.writeObject(pageToWrite);
 			}
-
-			isSucceed = true;
 		}catch (IOException e) {
-			isSucceed = false;
 			e.printStackTrace();
 		} finally {
-			outputStream.close();
-			return isSucceed;
+			try {
+				outputStream.close();
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

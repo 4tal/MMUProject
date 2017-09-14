@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.hit.algorithms.IAlgoCache;
 
@@ -76,5 +77,15 @@ public class MemoryManagementUnit{
 
 	private void setHardDisk(HardDisk hardDisk) {
 		this.hardDisk = hardDisk;
+	}
+	
+	public void ShutDown() throws FileNotFoundException, IOException
+	{	
+		Map<Long,Page<byte[]>> pages = ram.getPages();
+		
+		for(Map.Entry<Long,Page<byte[]>> page : pages.entrySet())
+		{
+			HardDisk.getInstance().pageReplacement(page.getValue(), null);
+		}
 	}
 }

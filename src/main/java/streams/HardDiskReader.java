@@ -8,11 +8,11 @@ import java.io.ObjectInputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class HardDiskReader implements Closeable{
+public class HardDiskReader extends ObjectInputStream{
 
 	private final ObjectInputStream inputStream;
 
-	public HardDiskReader(ObjectInputStream inputStream) {
+	public HardDiskReader(ObjectInputStream inputStream) throws IOException {
 		this.inputStream = inputStream;
 	}
 
@@ -23,13 +23,17 @@ public class HardDiskReader implements Closeable{
 		try{
 			boolean toContinue = true;
 			while (toContinue) {
-				page = (Page<byte[]>) inputStream.readObject();
+				page = (Page<byte[]>)inputStream.readObject();
 				pages.put(page.getPageId(), page);
 			}
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		} finally {
-			inputStream.close();
+			try {
+				inputStream.close();
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 		return pages;
