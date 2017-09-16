@@ -33,7 +33,6 @@ public class MMUTest {
 		byte[] byte4 = "sometotest4".getBytes();
 		byte[] byte5 = "sometotest5".getBytes();
 
-		Page<byte[]> p1 = new Page(ids[0], byte1);
 
 
 		Page<byte[]> page1 = new Page<>(ids[0], byte1);
@@ -58,6 +57,8 @@ public class MMUTest {
 
 		//this page does not exist should return null
 		assertEquals(null, mmuPage[0]);
+		
+		
 
 	}
 }
