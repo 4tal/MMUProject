@@ -29,6 +29,7 @@ public class ProcessCycle {
 		this.data = data;
 	}
 	
+	
 	@Override
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();

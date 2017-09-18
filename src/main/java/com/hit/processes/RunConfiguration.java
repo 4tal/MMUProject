@@ -16,4 +16,11 @@ public class RunConfiguration {
 	public void setProcessCtcles(List<ProcessCycle> processCtcles) {
 		this.processCtcles = processCtcles;
 	}
+
+	
+	//We need to override it.
+	public List<ProcessCycles> getProcessesCycles() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

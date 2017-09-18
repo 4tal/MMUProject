@@ -54,6 +54,7 @@ public class CLI extends Object implements Runnable {
 				input = in.nextLine();
 			}
 			
+			
 			if(input.matches("STOP")){
 				//Case user want to quit
 				//Need to add exit logic
@@ -63,6 +64,10 @@ public class CLI extends Object implements Runnable {
 			
 			//Logic for 
 			write("Not stop");
+			
+			
+			//Build the string with the alfo and capacity.!@#*(@!(@#!(#@!@(!#@#*!@!#*@!*@!&@!#&!@$&$&!*$@#*#*#$@*#@!*#@$!*!#*
+			//MMUDriver.start(command);
 			input = in.nextLine();
 		}
 		
