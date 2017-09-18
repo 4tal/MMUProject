@@ -10,21 +10,18 @@ import java.util.Scanner;
 
 public class CLI extends Object implements Runnable {
 	
-	static String LFU="LFU";
-	static String LRU="LRU";
-	static String RANDOM="RANDOM";
-	static String START="START";
-	static String STOP="STOP";
+	private static final String NFU = "NFU";
+	private static final String LRU = "LRU";
+	private static final String RANDOM = "RANDOM";
+	private static final String START = "START";
+	private static final String STOP = "STOP";
 	
 	
 	
 	private Scanner in;
-	private PrintWriter out;
-	private OutputStreamWriter outputToUserWR;
+	private PrintWriter out;	
 	
-	
-	public CLI(InputStream in, OutputStream out)
-	{
+	public CLI(InputStream in, OutputStream out) {
 		this.in = new Scanner(in);
 		this.out = new PrintWriter(out);
 	}
@@ -32,40 +29,46 @@ public class CLI extends Object implements Runnable {
 	
 	@Override
 	public void run() {
-		boolean programRunning=true;
+		String algoType = null;
+		String input = null;
+		boolean goodInput = false;
+		String[] command = new String[2];
 		
-		
-		String input = in.nextLine();
-		while(!(input.toUpperCase().matches(START)))
-		{
-			//Case input is not valid.
-			write("Not a valid command");
-			input = in.nextLine();
-		}
-		
-		write("Please enter required algorithm and RAM capacity");
+		write("Please type 'start' to start");
 		input = in.nextLine();
 		
-		while(programRunning){
-			while(!((input.toUpperCase().matches("(LRU|NFU|RANDOM)\\s\\d+")) || (input.matches(STOP))))
-			{
-				//Case input is not valid.
-				write("Not a valid command");
+		while(!input.toUpperCase().matches(STOP)) {
+			while(!input.toUpperCase().matches(START)) {
+				write("Invalid commant, please type 'start' to start");
 				input = in.nextLine();
 			}
 			
-			if(input.matches("STOP")){
-				//Case user want to quit
-				//Need to add exit logic
-				write("Stop");
-				programRunning=false;
-			}
+			do {
+				write("Please enter required algorithm and RAM capacity");
+				input = in.nextLine();
+				algoType = input.split(" ")[0];
+				if(algoType.toUpperCase().matches("(LRU|NFU|RANDOM)\\s\\d+") && tryParseInt(input.split(" ")[1])) {
+					goodInput = true;
+					command[0] = algoType;
+					command[1] = input.split(" ")[1];
+				}
+			} while (!goodInput);
 			
-			//Logic for 
-			write("Not stop");
-			input = in.nextLine();
+			MMUDriver.start(command);
 		}
 		
+		write("Thank you");
+		in.close();
+		out.close();		
+	}
+	
+	private boolean tryParseInt(String source) {
+		try {
+			Integer.parseInt(source);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
 	}
 	
 	public void write(String string)
