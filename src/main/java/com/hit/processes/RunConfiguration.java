@@ -3,24 +3,23 @@ package com.hit.processes;
 import java.util.List;
 
 public class RunConfiguration {
-	private List<ProcessCycle> processCtcles;
-	
-	public RunConfiguration(List<ProcessCycles> processesCycles) {
-		setProcessCtcles(processCtcles);
+	private List<ProcessCycles> processesCycles;
+
+	public RunConfiguration(List<ProcessCycles> processCycles) {
+		super();
+		this.processesCycles = processCycles;
 	}
 
-	public List<ProcessCycle> getProcessCtcles() {
-		return processCtcles;
+	public List<ProcessCycles> getProcessCycles() {
+		return processesCycles;
 	}
 
-	public void setProcessCtcles(List<ProcessCycle> processCtcles) {
-		this.processCtcles = processCtcles;
+	public void setProcessCycles(List<ProcessCycles> processCycles) {
+		this.processesCycles = processCycles;
 	}
 
-	
-	//We need to override it.
-	public List<ProcessCycles> getProcessesCycles() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public String toString() {
+		return "RunConfiguration [processCycle=" + processesCycles + "]";
 	}
 }

@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -25,43 +26,29 @@ import com.google.gson.stream.JsonReader;
 
 public class MMUDriver {
 	private static final String CONFIG_FILE = "src/main/resources/com/hit/config/Configuration.json";
-	private static final String ExecutorService = null;
+	
 	public static void main(String[] args){
 		CLI cli = new CLI(System.in, System.out);
 		new Thread(cli).start();
 	}
 	
-	
-	
-	public static void start(String[] command) throws Exception{
-	IAlgoCache<Long, Long> algo=null;
-	int capacity=Integer.parseInt(command[1]);
-	
-	switch(command[0]){
-		case "NFU": algo = new NFUAlgoCacheImpl<>(capacity);
-		 	break;
-		case "LRU": algo = new LRUAlgoCacheImpl<>(capacity);
-			break; 
-		case "RANDOM": algo = new Random<>(capacity);      
-			break;
-			
+	public MMUDriver() {
 		
 	}
-
-			
-		
-	MemoryManagementUnit mmu = new MemoryManagementUnit(capacity, algo);
-	RunConfiguration runConfig = readConfigurationFile();
-	List<ProcessCycles> processCycles = runConfig.getProcessesCycles();
-	List<Process> processes = createProcesses(processCycles, mmu);
-	runProcesses(processes);
-		
+	
+	public static void start(String[] command) throws InterruptedException, ExecutionException {
+		int capacity = Integer.parseInt(command[1]);
+		IAlgoCache<Long, Long> algo = createConcreteAlgo(command[0], capacity);
+		MemoryManagementUnit mmu = new MemoryManagementUnit(capacity, algo);
+		RunConfiguration runConfiguration = readConfigurationFile();
+		List<ProcessCycles> processCycles = runConfiguration.getProcessCycles();
+		List<Process> processes = createProcesses(processCycles, mmu);
+		runProcesses(processes);
 	}
 		
 	public static List<Process> createProcesses(List<ProcessCycles> appliocationsScenarios, MemoryManagementUnit mmu) {
 		List<Process> processList = new ArrayList<>();
 		int id = 1;
-			
 		for(ProcessCycles processCycles : appliocationsScenarios) {
 			id++;
 			processList.add(new Process(id, mmu, processCycles));
@@ -79,6 +66,9 @@ public class MMUDriver {
 			fileReader = new FileReader(CONFIG_FILE);
 			Gson gson = new Gson();
 			runConfiguration = gson.fromJson(new JsonReader(fileReader), RunConfiguration.class);
+			
+			System.out.println(runConfiguration.getProcessCycles());
+			
 		} catch (FileNotFoundException | JsonIOException | JsonSyntaxException e) {
 			System.out.println(e.getMessage());
 		}
@@ -87,7 +77,35 @@ public class MMUDriver {
 	}
 		
 	public static void runProcesses(List<Process> applications) throws InterruptedException, ExecutionException {
+		ExecutorService executer = Executors.newCachedThreadPool();
+		Future<Boolean> futures[] = new Future[applications.size()];
 		
+		for (int i = 0; i < futures.length; i++) {
+			futures[i] = executer.submit(applications.get(i));
+		}
+		
+		executer.shutdown();
+	}
+	
+	private static IAlgoCache<Long, Long> createConcreteAlgo(String algoName, int capacity) {
+		
+		IAlgoCache<Long, Long> algo = null;
+		
+		switch (algoName) {
+		case "NFU":
+			algo = new NFUAlgoCacheImpl<>(capacity);
+			break;
+		case "LRU":
+			algo = new LRUAlgoCacheImpl<>(capacity);
+			break;
+		case "RANDOM":
+			algo = new Random<>(capacity);
+			break;
+		default:
+			break;
+		}
+		
+		return algo;
 	}
 }
 
