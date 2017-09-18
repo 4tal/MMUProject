@@ -1,12 +1,11 @@
 package com.hit.driver;
 
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 
 public class CLI extends Object implements Runnable {
 	
@@ -29,7 +28,7 @@ public class CLI extends Object implements Runnable {
 	
 	@Override
 	public void run() {
-		String algoType = null;
+		String algoName = null;
 		String input = null;
 		boolean goodInput = false;
 		String[] command = new String[2];
@@ -37,8 +36,17 @@ public class CLI extends Object implements Runnable {
 		write("Please type 'start' to start");
 		input = in.nextLine();
 		
-		while(!input.toUpperCase().matches(STOP)) {
-			while(!input.toUpperCase().matches(START)) {
+		while(!input.toUpperCase().equals(STOP)) {
+			while(!input.toUpperCase().equals(START)) {
+				if(input.toUpperCase().equals(STOP)) {
+					goodInput = true;
+					break;
+				}
+				
+				if(goodInput) {
+					break;
+				}
+				
 				write("Invalid commant, please type 'start' to start");
 				input = in.nextLine();
 			}
@@ -46,15 +54,19 @@ public class CLI extends Object implements Runnable {
 			do {
 				write("Please enter required algorithm and RAM capacity");
 				input = in.nextLine();
-				algoType = input.split(" ")[0];
-				if(algoType.toUpperCase().matches("(LRU|NFU|RANDOM)\\s\\d+") && tryParseInt(input.split(" ")[1])) {
+				algoName = input.split(" ")[0];
+				if(isCorrectAlgoCommand(algoName) && tryParseInt(input.split(" ")[1])) {
 					goodInput = true;
-					command[0] = algoType;
-					command[1] = input.split(" ")[1];
+					command[0] = algoName.toUpperCase();
+					command[1] = input.split(" ")[1].toUpperCase();
 				}
 			} while (!goodInput);
 			
-			MMUDriver.start(command);
+			try {
+				MMUDriver.start(command);
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		write("Thank you");
@@ -77,4 +89,14 @@ public class CLI extends Object implements Runnable {
 		out.flush();
 	}
 	
+	private boolean isCorrectAlgoCommand(String algoName) {
+		boolean success = false;
+		algoName = algoName.toUpperCase();
+		
+		if(algoName.equals(NFU) || algoName.equals(LRU) || algoName.equals(RANDOM)) {
+			success = true;
+		}
+		
+		return success;
+	}
 }
