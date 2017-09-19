@@ -1,22 +1,17 @@
 package com.hit.memoryunits;
 
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
-public class RAM implements Serializable{
+public class RAM {
 
-	private static final long serialVersionUID = 1L;
 	private int initialCapacity;
-
 	private Map<Long, Page<byte[]>> pages;
 
 	public RAM(int initialCapacity){
 		setInitialCapacity(initialCapacity);
-		setPages(new LinkedHashMap<Long,Page<byte[]>>());
+		setPages(new LinkedHashMap<Long,Page<byte[]>>(initialCapacity));
 	}
 
 	/**
@@ -55,7 +50,7 @@ public class RAM implements Serializable{
 	 * @return all the pages
 	 */
 	public Map<Long,Page<byte[]>> getPages(){
-		return pages;
+		return this.pages;
 	}
 
 	/**

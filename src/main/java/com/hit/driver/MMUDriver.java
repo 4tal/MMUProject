@@ -67,8 +67,6 @@ public class MMUDriver {
 			Gson gson = new Gson();
 			runConfiguration = gson.fromJson(new JsonReader(fileReader), RunConfiguration.class);
 			
-			System.out.println(runConfiguration.getProcessCycles());
-			
 		} catch (FileNotFoundException | JsonIOException | JsonSyntaxException e) {
 			System.out.println(e.getMessage());
 		}
@@ -85,6 +83,9 @@ public class MMUDriver {
 		}
 		
 		executer.shutdown();
+		for(int i = 0; i < applications.size(); ++i) {
+			System.out.println(String.format("process %d : %s", applications.get(i).getId(), futures[i].get()));
+		}
 	}
 	
 	private static IAlgoCache<Long, Long> createConcreteAlgo(String algoName, int capacity) {

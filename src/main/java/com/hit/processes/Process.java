@@ -21,33 +21,22 @@ public class Process implements Callable<Boolean> {
 	
 	@Override
 	public Boolean call() throws Exception {
-		List<ProcessCycle> cycles = processCycles.getProcessCycles();
-		
-		for (ProcessCycle processCycle : cycles) {
-			Long[] pagesIds = new Long[processCycle.getPages().size()];
-			pagesIds = processCycle.getPages().toArray(pagesIds);
-			
-			try {
-				Page<byte[]>[] returnedPages = mmu.getPages(pagesIds);
+		try {
+			for(ProcessCycle processCycle : processCycles.getProcessCycles()) {
+				Long[] ids = (Long[])processCycle.getPages().toArray();
+				Page<byte[]>[] pages = mmu.getPages(ids);
 				
-				for (int i = 0; i < returnedPages.length; i++) {
-					//it's synchronized to avoid that other thread will interrupt during changing the content
-					synchronized (returnedPages[i]) {
-						for(int j = 0; j < processCycle.getData().get(i).length; ++j) {
-							returnedPages[i].getContent()[j] = processCycle.getData().get(i)[j];
-						}
-					}
+				for (int i = 0; i < pages.length; i++) {
+					pages[i].setContent(processCycle.getData().get(i));
 				}
 				
 				Thread.sleep(processCycle.getSleepMs());
-			} catch (InterruptedException | IOException e) {
-				e.printStackTrace();
-				System.out.println(e.getMessage());
-				return false;
 			}
+			
+			return true;
+		} catch (Exception e) {
+			return false;
 		}
-		
-		return true;
 	}
 
 	public int getId() {

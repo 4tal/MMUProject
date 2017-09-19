@@ -20,6 +20,7 @@ public class MemoryManagementUnit{
 	public MemoryManagementUnit(int ramCapacity, IAlgoCache<Long, Long> algo){
 		setRam(new RAM(ramCapacity));
 		setAlgo(algo);
+		hardDisk = HardDisk.getInstance();
 	}
 
 	/**
@@ -31,36 +32,29 @@ public class MemoryManagementUnit{
 	 */
 	public synchronized Page<byte[]>[] getPages(Long[] pageIds) throws IOException{
 
-		Page<byte[]>[] pagesResult = new Page[pageIds.length];
-		hardDisk = HardDisk.getInstance();
-
-		for (int i = 0; i < pageIds.length; i++) {
-			//if ram contains this page
-			if (algo.getElement(pageIds[i]) != null) {
-				pagesResult[i] = ram.getPage(pageIds[i]);
-			} else if (ram.getRAMSize() < ram.getInitialCapacity()) { //have space for the page but the page isn't in the RAM
-
-				if (hardDisk.pageFault(pageIds[i]) != null) {
-					algo.putElement(pageIds[i], pageIds[i]);
+		Page<byte[]>[] pageResult = new Page[pageIds.length];
+		Page<byte[]> pageHdTarget = null;
+		Long idPageReplace = null;
+		
+		for(int i=0; i<pageIds.length;i++)
+		{
+			if(algo.getElement(pageIds[i]) == null)
+			{ 
+				//if RAM is not full
+				if(ram.getRAMSize() <= ram.getInitialCapacity()) {
+					algo.putElement(pageIds[i],pageIds[i]);
 					ram.addPage(hardDisk.pageFault(pageIds[i]));
-					pagesResult[i] = ram.getPage(pageIds[i]);
+				} else {
+					idPageReplace = algo.putElement(pageIds[i],pageIds[i]);
+					pageHdTarget = ram.getPage(idPageReplace);
+					ram.addPage(hardDisk.pageReplacement(pageHdTarget, pageIds[i]));
 				}
-			} else if (hardDisk.pageFault(pageIds[i]) != null) { //ram is full then replace the page
-
-				long id = algo.putElement(pageIds[i], pageIds[i]);
-				Page<byte[]> removedPage;
-				removedPage = ram.getPage(id);
-				ram.removePage(removedPage);
-				ram.addPage(hardDisk.pageReplacement(removedPage, pageIds[i]));
-				pagesResult[i] = ram.getPage(pageIds[i]);
 			}
+			
+			pageResult[i] = ram.getPage(pageIds[i]);
 		}
-
-		return pagesResult;
-	}
-
-	private RAM getRam() {
-		return ram;
+		
+		return pageResult;
 	}
 
 	private void setRam(RAM ram) {
@@ -71,21 +65,13 @@ public class MemoryManagementUnit{
 		this.algo = algo;
 	}
 
-	private HardDisk getHardDisk() {
-		return hardDisk;
-	}
-
-	private void setHardDisk(HardDisk hardDisk) {
-		this.hardDisk = hardDisk;
-	}
-	
 	public void ShutDown() throws FileNotFoundException, IOException
 	{	
 		Map<Long,Page<byte[]>> pages = ram.getPages();
 		
 		for(Map.Entry<Long,Page<byte[]>> page : pages.entrySet())
 		{
-			HardDisk.getInstance().pageReplacement(page.getValue(), null);
+			hardDisk.pageReplacement(page.getValue(), null);
 		}
 	}
 }

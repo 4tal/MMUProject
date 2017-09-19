@@ -32,13 +32,8 @@ public class ProcessCycle {
 	
 	@Override
 	public String toString() {
-		StringBuilder stringBuilder = new StringBuilder();
 		
-		for (int i = 0; i < data.size(); i++) {
-			stringBuilder.append(data.get(i).toString());
-		}
-		
-		return stringBuilder.toString();
+		return "ProcessCycle [pages=" + pages + ", sleepMs=" + sleepMs + ", data=" + data + "]";
 	}
 
 	public int getSleepMs() {

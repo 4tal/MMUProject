@@ -11,10 +11,9 @@ public class ProcessCycles {
 		setProcessCycles(processCycles);
 	}
 
-	//we have to override this method, have to fix implementation
 	@Override
 	public String toString() {
-		return processCycles.toString();
+		return "ProcessCycles [processCycles=" + processCycles + "]";
 	}
 
 	public List<ProcessCycle> getProcessCycles() {
