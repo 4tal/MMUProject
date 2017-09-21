@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import com.hit.algorithms.IAlgoCache;
+import com.hit.util.MMULogger;
 
 /**
  * This class represents the MMU - Hardware device that maps virtual to physical address by software
@@ -16,11 +18,16 @@ public class MemoryManagementUnit{
 	private RAM ram;
 	private IAlgoCache<Long, Long> algo;
 	private HardDisk hardDisk;
+	private MMULogger logger;
+	private static String nextLine = System.getProperty("line.seperator");
 
 	public MemoryManagementUnit(int ramCapacity, IAlgoCache<Long, Long> algo){
 		setRam(new RAM(ramCapacity));
 		setAlgo(algo);
 		hardDisk = HardDisk.getInstance();
+		logger = MMULogger.getInstance();
+		String nextLine = System.getProperty("line.seperator");
+		logger.write("RC:" + ramCapacity + nextLine, Level.INFO);
 	}
 
 	/**
@@ -33,25 +40,24 @@ public class MemoryManagementUnit{
 	public synchronized Page<byte[]>[] getPages(Long[] pageIds) throws IOException{
 
 		Page<byte[]>[] pageResult = new Page[pageIds.length];
-		Page<byte[]> pageHdTarget = null;
-		Long idPageReplace = null;
 		
-		for(int i=0; i<pageIds.length;i++)
-		{
-			if(algo.getElement(pageIds[i]) == null)
-			{ 
-				//if RAM is not full
-				if(ram.getRAMSize() <= ram.getInitialCapacity()) {
-					algo.putElement(pageIds[i],pageIds[i]);
+		for(int i = 0; i < pageIds.length; i++) {
+			if(algo.getElement(pageIds[i]) != null) {
+				pageResult[i] = ram.getPage(pageIds[i]);
+			} else if(ram.getRAMSize() < ram.getInitialCapacity()) {
+				if(hardDisk.pageFault(pageIds[i]) != null) {
+					algo.putElement(pageIds[i], pageIds[i]);
 					ram.addPage(hardDisk.pageFault(pageIds[i]));
-				} else {
-					idPageReplace = algo.putElement(pageIds[i],pageIds[i]);
-					pageHdTarget = ram.getPage(idPageReplace);
-					ram.addPage(hardDisk.pageReplacement(pageHdTarget, pageIds[i]));
+					logger.write("PF:" + pageIds[i] + nextLine, Level.INFO);
 				}
+			} else if(hardDisk.pageFault(pageIds[i]) != null) {
+				Long id = algo.putElement(pageIds[i], pageIds[i]);
+				Page<byte[]> pageToRemoved = ram.getPage(pageIds[i]);
+				ram.removePage(pageToRemoved);
+				ram.addPage(hardDisk.pageReplacement(pageToRemoved, pageIds[i]));
+				pageResult[i] = ram.getPage(pageIds[i]);
+				logger.write("PR:MTH " + pageToRemoved.getPageId() + " MTR" + pageIds[i] + nextLine, Level.INFO);
 			}
-			
-			pageResult[i] = ram.getPage(pageIds[i]);
 		}
 		
 		return pageResult;
@@ -65,7 +71,7 @@ public class MemoryManagementUnit{
 		this.algo = algo;
 	}
 
-	public void ShutDown() throws FileNotFoundException, IOException
+	public void shutDown() throws FileNotFoundException, IOException
 	{	
 		Map<Long,Page<byte[]>> pages = ram.getPages();
 		
