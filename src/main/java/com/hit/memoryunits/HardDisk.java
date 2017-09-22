@@ -75,9 +75,9 @@ public final class HardDisk {
 	private void readFromHD()  throws FileNotFoundException, IOException{
 		
 		//try with resources automatically do "finally=> close"
-		try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(DEAFAULT_FILE_NAME))) {
-			pagesOnHD = (HashMap<Long,Page<byte[]>>)inputStream.readObject();
-		} catch (ClassNotFoundException | IOException e) {
+		try {
+			pagesOnHD = readAllPages();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -86,5 +86,23 @@ public final class HardDisk {
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		throw new CloneNotSupportedException();
+	}
+	
+	private Map<Long, Page<byte[]>> readAllPages() throws FileNotFoundException, IOException 
+	{
+		boolean toContinue = true;
+		Map<Long, Page<byte[]>> pages = new LinkedHashMap<Long, Page<byte[]>>();
+		Page<byte[]> page = new Page<byte[]>();
+		try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(DEAFAULT_FILE_NAME))) {
+			while(toContinue)
+			{
+				page = (Page<byte[]>)inputStream.readObject();
+				pages.put(page.getPageId(), page);
+			}
+		} catch (ClassNotFoundException | IOException e) {
+			e.printStackTrace();
+		}
+		
+		return pages;
 	}
 }
