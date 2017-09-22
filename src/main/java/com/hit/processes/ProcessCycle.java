@@ -1,5 +1,6 @@
 package com.hit.processes;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class ProcessCycle {
@@ -33,7 +34,7 @@ public class ProcessCycle {
 	@Override
 	public String toString() {
 		
-		return "ProcessCycle [pages=" + pages + ", sleepMs=" + sleepMs + ", data=" + data + "]";
+		return "ProcessCycle [pages=" + pages + ", sleepMs=" + sleepMs + ", data=" + Arrays.toString(data.toArray()) + "]";
 	}
 
 	public int getSleepMs() {
