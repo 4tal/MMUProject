@@ -19,15 +19,14 @@ public class MemoryManagementUnit{
 	private IAlgoCache<Long, Long> algo;
 	private HardDisk hardDisk;
 	private MMULogger logger;
-	private static String nextLine = System.getProperty("line.seperator");
+	
 
 	public MemoryManagementUnit(int ramCapacity, IAlgoCache<Long, Long> algo){
 		setRam(new RAM(ramCapacity));
 		setAlgo(algo);
 		hardDisk = HardDisk.getInstance();
 		logger = MMULogger.getInstance();
-		String nextLine = System.getProperty("line.seperator");
-		logger.write("RC:" + ramCapacity + nextLine, Level.INFO);
+		logger.write("RC:" + ramCapacity + "\n", Level.INFO);
 	}
 
 	/**
@@ -40,7 +39,6 @@ public class MemoryManagementUnit{
 	public synchronized Page<byte[]>[] getPages(Long[] pageIds) throws IOException{
 
 		Page<byte[]>[] pageResult = new Page[pageIds.length];
-		
 		for(int i = 0; i < pageIds.length; i++) {
 			if(algo.getElement(pageIds[i]) != null) {
 				pageResult[i] = ram.getPage(pageIds[i]);
@@ -48,7 +46,7 @@ public class MemoryManagementUnit{
 				if(hardDisk.pageFault(pageIds[i]) != null) {
 					algo.putElement(pageIds[i], pageIds[i]);
 					ram.addPage(hardDisk.pageFault(pageIds[i]));
-					logger.write("PF:" + pageIds[i] + nextLine, Level.INFO);
+					logger.write("PF:" + pageIds[i] + "\n", Level.INFO);
 				}
 			} else if(hardDisk.pageFault(pageIds[i]) != null) {
 				Long id = algo.putElement(pageIds[i], pageIds[i]);
@@ -56,7 +54,7 @@ public class MemoryManagementUnit{
 				ram.removePage(pageToRemoved);
 				ram.addPage(hardDisk.pageReplacement(pageToRemoved, pageIds[i]));
 				pageResult[i] = ram.getPage(pageIds[i]);
-				logger.write("PR:MTH " + pageToRemoved.getPageId() + " MTR" + pageIds[i] + nextLine, Level.INFO);
+				logger.write("PR:MTH " + pageToRemoved.getPageId() + " MTR" + pageIds[i] + "\n", Level.INFO);
 			}
 		}
 		

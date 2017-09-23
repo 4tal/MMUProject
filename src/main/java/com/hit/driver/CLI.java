@@ -1,6 +1,7 @@
 package com.hit.driver;
 
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -31,6 +32,7 @@ public class CLI extends Object implements Runnable {
 		String algoName = null;
 		String input = null;
 		boolean goodInput = false;
+		boolean stop = false;
 		String[] command = new String[2];
 		
 		write("Please type 'start' to start");
@@ -55,6 +57,11 @@ public class CLI extends Object implements Runnable {
 				write("Please enter required algorithm and RAM capacity");
 				input = in.nextLine();
 				algoName = input.split(" ")[0];
+				if(input.toUpperCase().equals(STOP)) {
+					stop = true;
+					break;
+				}
+				
 				if(isCorrectAlgoCommand(algoName) && tryParseInt(input.split(" ")[1])) {
 					goodInput = true;
 					command[0] = algoName.toUpperCase();
@@ -62,10 +69,12 @@ public class CLI extends Object implements Runnable {
 				}
 			} while (!goodInput);
 			
-			try {
-				MMUDriver.start(command);
-			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
+			if(!stop) {
+				try {
+					MMUDriver.start(command);
+				} catch (InterruptedException | ExecutionException | IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		

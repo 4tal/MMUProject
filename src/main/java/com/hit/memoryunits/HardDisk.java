@@ -1,24 +1,39 @@
 package com.hit.memoryunits;
 
-import streams.HardDiskReader;
 import streams.HardDiskWriter;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+
+import com.hit.util.MMULogger;
 
 public final class HardDisk {
 
 	private static final int SIZE = 1000;
 	private static final String DEAFAULT_FILE_NAME = "src/main/resources/com/hit/config/harddisk";
-	private boolean firstRead;
 	private static final HardDisk instance = new HardDisk();
-	public Map<Long,Page<byte[]>> pagesOnHD;
+	private Map<Long,Page<byte[]>> pagesOnHD;
+	private MMULogger logger;
 
 
 	private HardDisk() {
 		this.pagesOnHD = new HashMap<>();
+		this.logger = MMULogger.getInstance();
+		
+		for(Long i = 0L; i < SIZE; i++) {
+			pagesOnHD.put(i, new Page<byte[]>(i, i.toString().getBytes()));
+		}
+		
+		try {
+			writeToHD();
+		} catch (IOException e) {
+			e.printStackTrace();
+			String nextLine = System.getProperty("line.seperator");
+			logger.write(e.getMessage() + nextLine, Level.SEVERE);
+		}
 	}
 
 	public static HardDisk getInstance() {
@@ -50,15 +65,12 @@ public final class HardDisk {
 	 * @throws FileNotFoundException indicates problems read from files that behave like HD
 	 */
 	public Page<byte[]> pageReplacement(Page<byte[]> moveToHdPage, Long moveToRamId) throws FileNotFoundException, IOException{
+		readFromHD();
 		pagesOnHD.put(moveToHdPage.getPageId(), moveToHdPage);
-
-		if (pageFault(moveToRamId) != null) {
-			return pageFault(moveToRamId);
-		}
-
+		Page<byte[]> pageReturn = pagesOnHD.get(moveToRamId);
 		writeToHD();
-
-		return null;
+		
+		return pageReturn;
 	}
 
 	private void writeToHD() throws FileNotFoundException, IOException {
@@ -68,6 +80,8 @@ public final class HardDisk {
 			outputStream.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
+			String nextLine = System.getProperty("line.seperator");
+			logger.write(e.getMessage() + nextLine, Level.SEVERE);
 		}
 	}
 
@@ -79,6 +93,8 @@ public final class HardDisk {
 			pagesOnHD = readAllPages();
 		} catch (IOException e) {
 			e.printStackTrace();
+			String nextLine = System.getProperty("line.seperator");
+			logger.write(e.getMessage() + nextLine, Level.SEVERE);
 		}
 	}
 
@@ -88,6 +104,7 @@ public final class HardDisk {
 		throw new CloneNotSupportedException();
 	}
 	
+	@SuppressWarnings("unchecked")
 	private Map<Long, Page<byte[]>> readAllPages() throws FileNotFoundException, IOException 
 	{
 		boolean toContinue = true;
@@ -101,6 +118,8 @@ public final class HardDisk {
 			}
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
+			String nextLine = System.getProperty("line.seperator");
+			logger.write(e.getMessage() + nextLine, Level.SEVERE);
 		}
 		
 		return pages;

@@ -3,7 +3,7 @@ package com.hit.memoryunits;
 
 public class Page<T> implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -15646545654L;
 	
 	private T content;
 	private Long id;
@@ -38,7 +38,7 @@ public class Page<T> implements java.io.Serializable {
 			return false;
 		}
 
-		Page page = (Page) obj;
+		Page<?> page = (Page) obj;
 
 		return page.getPageId() == this.id;
 	}

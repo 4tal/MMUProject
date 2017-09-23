@@ -2,8 +2,6 @@ package com.hit.processes;
 
 import java.util.List;
 
-import com.hit.memoryunits.MemoryManagementUnit;
-
 public class ProcessCycles {
 	private List<ProcessCycle> processCycles;
 

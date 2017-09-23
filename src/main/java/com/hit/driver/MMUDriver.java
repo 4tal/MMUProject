@@ -4,25 +4,24 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.stream.JsonReader;
 import com.hit.algorithms.IAlgoCache;
 import com.hit.algorithms.LRUAlgoCacheImpl;
 import com.hit.algorithms.NFUAlgoCacheImpl;
 import com.hit.algorithms.Random;
 import com.hit.memoryunits.MemoryManagementUnit;
-import com.hit.processes.*;
 import com.hit.processes.Process;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.stream.JsonReader;
+import com.hit.processes.ProcessCycles;
+import com.hit.processes.RunConfiguration;
 
 public class MMUDriver {
 	private static final String CONFIG_FILE = "src/main/resources/com/hit/config/Configuration.json";
@@ -36,7 +35,7 @@ public class MMUDriver {
 		
 	}
 	
-	public static void start(String[] command) throws InterruptedException, ExecutionException {
+	public static void start(String[] command) throws InterruptedException, ExecutionException, FileNotFoundException, IOException {
 		int capacity = Integer.parseInt(command[1]);
 		IAlgoCache<Long, Long> algo = createConcreteAlgo(command[0], capacity);
 		MemoryManagementUnit mmu = new MemoryManagementUnit(capacity, algo);
@@ -44,6 +43,7 @@ public class MMUDriver {
 		List<ProcessCycles> processCycles = runConfiguration.getProcessCycles();
 		List<Process> processes = createProcesses(processCycles, mmu);
 		runProcesses(processes);
+		mmu.shutDown();
 	}
 		
 	public static List<Process> createProcesses(List<ProcessCycles> appliocationsScenarios, MemoryManagementUnit mmu) {
