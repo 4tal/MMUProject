@@ -99,25 +99,4 @@ public final class HardDisk {
 	protected Object clone() throws CloneNotSupportedException {
 		throw new CloneNotSupportedException();
 	}
-	
-//	@SuppressWarnings("unchecked")
-//	private Map<Long, Page<byte[]>> readAllPages() throws FileNotFoundException, IOException 
-//	{
-//		boolean toContinue = true;
-//		Map<Long, Page<byte[]>> pages = new LinkedHashMap<Long, Page<byte[]>>();
-//		Page<byte[]> page = new Page<byte[]>();
-//		try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(DEAFAULT_FILE_NAME))) {
-//			while(toContinue)
-//			{
-//				page = (Page<byte[]>)inputStream.readObject();
-//				pages.put(page.getPageId(), page);
-//			}
-//		} catch (ClassNotFoundException | IOException e) {
-//			e.printStackTrace();
-//			String nextLine = System.getProperty("line.seperator");
-//			logger.write(e.getMessage() + nextLine, Level.SEVERE);
-//		}
-//		
-//		return pages;
-//	}
 }
