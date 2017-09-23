@@ -38,27 +38,33 @@ public class MemoryManagementUnit{
 	 */
 	public synchronized Page<byte[]>[] getPages(Long[] pageIds) throws IOException{
 
-		Page<byte[]>[] pageResult = new Page[pageIds.length];
-		for(int i = 0; i < pageIds.length; i++) {
-			if(algo.getElement(pageIds[i]) != null) {
-				pageResult[i] = ram.getPage(pageIds[i]);
-			} else if(ram.getRAMSize() < ram.getInitialCapacity()) {
-				if(hardDisk.pageFault(pageIds[i]) != null) {
-					algo.putElement(pageIds[i], pageIds[i]);
-					ram.addPage(hardDisk.pageFault(pageIds[i]));
-					logger.write("PF:" + pageIds[i] + "\n", Level.INFO);
+		Page<byte[]>[] result = new Page[pageIds.length];
+
+		for (int i = 0; i < pageIds.length; i++) {
+			if (algo.getElement(pageIds[i]) == null) {
+				if (ram.getRAMSize() < ram.getInitialCapacity()) {
+					// adding the missing pageId to the ram
+					algo.putElement(pageIds[i],pageIds[i]);
+					// adding the missing page to the ram
+					result[i] = hardDisk.pageFault(pageIds[i]);
+					logger.write("PF " + pageIds[i]+ "\r\n", Level.INFO);
+					ram.addPage(result[i]);
+				} else {
+					// adding the missing pageId to the ram algo
+					// saving the id of the revomed page to save on the HD
+					Long pageIdToHd = algo.putElement(pageIds[i],pageIds[i]);
+					// getting the page
+					Page<byte[]> pageToHd = ram.getPage(pageIdToHd);
+					ram.removePage(pageToHd);
+					result[i] = hardDisk.pageReplacement(pageToHd, pageIds[i]);
+					logger.write("PR MTH " + pageIdToHd+" " + "MTR " + pageIds[i]+ "\r\n", Level.INFO);
+					ram.addPage(result[i]);
 				}
-			} else if(hardDisk.pageFault(pageIds[i]) != null) {
-				Long id = algo.putElement(pageIds[i], pageIds[i]);
-				Page<byte[]> pageToRemoved = ram.getPage(pageIds[i]);
-				ram.removePage(pageToRemoved);
-				ram.addPage(hardDisk.pageReplacement(pageToRemoved, pageIds[i]));
-				pageResult[i] = ram.getPage(pageIds[i]);
-				logger.write("PR:MTH " + pageToRemoved.getPageId() + " MTR" + pageIds[i] + "\n", Level.INFO);
+			} else {
+				result[i] = ram.getPage(algo.getElement(pageIds[i]));
 			}
 		}
-		
-		return pageResult;
+		return result;
 	}
 
 	private void setRam(RAM ram) {

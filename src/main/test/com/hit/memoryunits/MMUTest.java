@@ -21,7 +21,7 @@ public class MMUTest {
 		@SuppressWarnings("unchecked")
 		Page<byte[]>[] expectedPages = new Page[9];
 		
-		Long val = 1L;
+		Long val = 0L;
 		
 		for(int i = 0; i < expectedPages.length; i++) {
 			expectedPages[i] = new Page<>(val, val.toString().getBytes());

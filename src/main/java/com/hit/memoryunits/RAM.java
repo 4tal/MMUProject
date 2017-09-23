@@ -1,7 +1,7 @@
 package com.hit.memoryunits;
 
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 public class RAM {
@@ -11,7 +11,7 @@ public class RAM {
 
 	public RAM(int initialCapacity){
 		setInitialCapacity(initialCapacity);
-		setPages(new LinkedHashMap<Long,Page<byte[]>>(initialCapacity));
+		pages = new HashMap<>(initialCapacity);
 	}
 
 	/**
@@ -59,6 +59,7 @@ public class RAM {
 	 * @return all the pages that matches the id's
 	 */
 	public Page<byte[]>[] getPages(Long[] pageIds){
+		@SuppressWarnings("unchecked")
 		Page<byte[]>[] pagesResult = new Page[pageIds.length];
 
 		for (int i = 0; i < pageIds.length; i++) {

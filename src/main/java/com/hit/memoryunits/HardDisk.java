@@ -1,10 +1,12 @@
 package com.hit.memoryunits;
 
-import streams.HardDiskWriter;
-
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -31,8 +33,7 @@ public final class HardDisk {
 			writeToHD();
 		} catch (IOException e) {
 			e.printStackTrace();
-			String nextLine = System.getProperty("line.seperator");
-			logger.write(e.getMessage() + nextLine, Level.SEVERE);
+			logger.write(e.getMessage() + "\n", Level.SEVERE);
 		}
 	}
 
@@ -80,21 +81,16 @@ public final class HardDisk {
 			outputStream.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
-			String nextLine = System.getProperty("line.seperator");
-			logger.write(e.getMessage() + nextLine, Level.SEVERE);
+			logger.write(e.getMessage() + "\n", Level.SEVERE);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	private void readFromHD()  throws FileNotFoundException, IOException{
-		
-		//try with resources automatically do "finally=> close"
-		try {
-			pagesOnHD = readAllPages();
-		} catch (IOException e) {
-			e.printStackTrace();
-			String nextLine = System.getProperty("line.seperator");
-			logger.write(e.getMessage() + nextLine, Level.SEVERE);
+		try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(DEAFAULT_FILE_NAME))) {
+			pagesOnHD = (HashMap<Long, Page<byte[]>>) inputStream.readObject();
+		} catch (ClassNotFoundException e) {
+			logger.write(e.getMessage(), Level.SEVERE);
 		}
 	}
 
@@ -104,24 +100,24 @@ public final class HardDisk {
 		throw new CloneNotSupportedException();
 	}
 	
-	@SuppressWarnings("unchecked")
-	private Map<Long, Page<byte[]>> readAllPages() throws FileNotFoundException, IOException 
-	{
-		boolean toContinue = true;
-		Map<Long, Page<byte[]>> pages = new LinkedHashMap<Long, Page<byte[]>>();
-		Page<byte[]> page = new Page<byte[]>();
-		try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(DEAFAULT_FILE_NAME))) {
-			while(toContinue)
-			{
-				page = (Page<byte[]>)inputStream.readObject();
-				pages.put(page.getPageId(), page);
-			}
-		} catch (ClassNotFoundException | IOException e) {
-			e.printStackTrace();
-			String nextLine = System.getProperty("line.seperator");
-			logger.write(e.getMessage() + nextLine, Level.SEVERE);
-		}
-		
-		return pages;
-	}
+//	@SuppressWarnings("unchecked")
+//	private Map<Long, Page<byte[]>> readAllPages() throws FileNotFoundException, IOException 
+//	{
+//		boolean toContinue = true;
+//		Map<Long, Page<byte[]>> pages = new LinkedHashMap<Long, Page<byte[]>>();
+//		Page<byte[]> page = new Page<byte[]>();
+//		try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(DEAFAULT_FILE_NAME))) {
+//			while(toContinue)
+//			{
+//				page = (Page<byte[]>)inputStream.readObject();
+//				pages.put(page.getPageId(), page);
+//			}
+//		} catch (ClassNotFoundException | IOException e) {
+//			e.printStackTrace();
+//			String nextLine = System.getProperty("line.seperator");
+//			logger.write(e.getMessage() + nextLine, Level.SEVERE);
+//		}
+//		
+//		return pages;
+//	}
 }

@@ -42,4 +42,9 @@ public class MMULogger {
 		}
 		
 	}
+	
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		throw new CloneNotSupportedException();
+	}
 }
