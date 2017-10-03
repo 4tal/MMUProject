@@ -9,7 +9,7 @@ import java.util.logging.LogRecord;
 public class MMULogger {
 	private final static String DEFAULT_FILE_NAME = "logs/log.txt";
 	private FileHandler handler;
-	private static MMULogger instance = new MMULogger();
+	private static MMULogger instance =null;
 	
 	private MMULogger() {
 		try {
@@ -20,6 +20,9 @@ public class MMULogger {
 	}
 	
 	public static MMULogger getInstance() {
+		if(instance==null){
+			instance= new MMULogger();
+		}
 		return instance;
 	}
 	
