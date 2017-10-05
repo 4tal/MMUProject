@@ -19,6 +19,7 @@ import com.hit.algorithms.LRUAlgoCacheImpl;
 import com.hit.algorithms.NFUAlgoCacheImpl;
 import com.hit.algorithms.Random;
 import com.hit.memoryunits.MemoryManagementUnit;
+import com.hit.model.MMUModel;
 import com.hit.processes.Process;
 import com.hit.processes.ProcessCycles;
 import com.hit.processes.RunConfiguration;
@@ -28,6 +29,19 @@ public class MMUDriver {
 	
 	public static void main(String[] args){
 		CLI cli = new CLI(System.in, System.out);
+		//MMUModel model=new MMUModel("src/main/resources/com/hit/config/"+CONFIG_FILE);
+		
+		
+		//model.addObserver(controller);
+		
+		/*
+		 * MMUView view=new MMUView();
+		 * 
+		 * 
+		 */
+		
+		
+		
 		new Thread(cli).start();
 	}
 	
