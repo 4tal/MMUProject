@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Observable;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
-public class CLI extends Object implements Runnable {
+import com.hit.view.View;
+
+public class CLI extends Observable implements Runnable,View {
 	
 	private static final String NFU = "NFU";
 	private static final String LRU = "LRU";
@@ -33,7 +36,7 @@ public class CLI extends Object implements Runnable {
 		String input = null;
 		boolean goodInput = false;
 		boolean stop = false;
-		String[] command = new String[2];
+		String[] command = new String[3];
 		
 		write("Please type 'start' to start");
 		input = in.nextLine();
@@ -70,13 +73,15 @@ public class CLI extends Object implements Runnable {
 			} while (!goodInput);
 			
 			if(!stop) {
-				try {
-					MMUDriver.start(command);
-				} catch (InterruptedException | ExecutionException | IOException e) {
-					e.printStackTrace();
-				}
+
+					//MMUDriver.start(command);
+					setChanged();
+					notifyObservers(command);	
 			}
 		}
+		command[2]="exit";
+		setChanged();
+		notifyObservers(command);
 		
 		write("Thank you");
 		in.close();
@@ -107,5 +112,12 @@ public class CLI extends Object implements Runnable {
 		}
 		
 		return success;
+	}
+
+
+	@Override
+	public void start() {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -18,37 +18,36 @@ import com.hit.algorithms.IAlgoCache;
 import com.hit.algorithms.LRUAlgoCacheImpl;
 import com.hit.algorithms.NFUAlgoCacheImpl;
 import com.hit.algorithms.Random;
+import com.hit.controller.MMUController;
 import com.hit.memoryunits.MemoryManagementUnit;
 import com.hit.model.MMUModel;
 import com.hit.processes.Process;
 import com.hit.processes.ProcessCycles;
 import com.hit.processes.RunConfiguration;
+import com.hit.view.MMUView;
 
 public class MMUDriver {
 	private static final String CONFIG_FILE = "src/main/resources/com/hit/config/Configuration.json";
 	
 	public static void main(String[] args){
 		CLI cli = new CLI(System.in, System.out);
-		//MMUModel model=new MMUModel("src/main/resources/com/hit/config/"+CONFIG_FILE);
+		MMUModel model=new MMUModel("src/main/resources/com/hit/config/"+CONFIG_FILE);
+		MMUView view=new MMUView();
+		MMUController controller=new MMUController(model, view);
 		
-		
-		//model.addObserver(controller);
-		
-		/*
-		 * MMUView view=new MMUView();
-		 * 
-		 * 
-		 */
-		
-		
-		
+		model.addObserver(controller);	
+		cli.addObserver(controller);
+		//view.addObserver(controller);
+			
 		new Thread(cli).start();
+		
+		
 	}
 	
 	public MMUDriver() {
 		
 	}
-	
+	/*
 	public static void start(String[] command) throws InterruptedException, ExecutionException, FileNotFoundException, IOException {
 		int capacity = Integer.parseInt(command[1]);
 		IAlgoCache<Long, Long> algo = createConcreteAlgo(command[0], capacity);
@@ -122,5 +121,7 @@ public class MMUDriver {
 		
 		return algo;
 	}
+	
+	*/
 }
 
