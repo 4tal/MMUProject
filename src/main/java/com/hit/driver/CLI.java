@@ -37,6 +37,7 @@ public class CLI extends Observable implements Runnable,View {
 		boolean goodInput = false;
 		boolean stop = false;
 		String[] command = new String[3];
+		command[2]="None";
 		
 		write("Please type 'start' to start");
 		input = in.nextLine();
@@ -76,7 +77,10 @@ public class CLI extends Observable implements Runnable,View {
 
 					//MMUDriver.start(command);
 					setChanged();
-					notifyObservers(command);	
+					System.out.println(command);
+					notifyObservers(command);
+					System.out.println(command);
+					System.out.println("notStop");
 			}
 		}
 		command[2]="exit";

@@ -28,6 +28,7 @@ public class MMUView extends Observable implements View {
 	 * @wbp.parser.entryPoint
 	 */
 	public MMUView(){
+		System.out.println("View Started");
 		//need to make this command to active:
 		//notInit=false;
 		//start();
