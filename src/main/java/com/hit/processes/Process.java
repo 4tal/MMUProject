@@ -1,41 +1,48 @@
 package com.hit.processes;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
 
 import com.hit.memoryunits.MemoryManagementUnit;
 import com.hit.memoryunits.Page;
+import com.hit.util.MMULogger;
 
 public class Process implements Callable<Boolean> {
 
 	private int id;
 	private MemoryManagementUnit mmu;
 	private ProcessCycles processCycles;
+	private MMULogger logger;
 	
 	public Process(int id, MemoryManagementUnit mmu, ProcessCycles processCycles) {
 		setId(id);
 		this.mmu = mmu;
 		this.processCycles = processCycles;
+		this.logger = MMULogger.getInstance();
 	}
 	
 	@Override
 	public Boolean call() throws Exception {
 		try {
-			for(ProcessCycle processCycle : processCycles.getProcessCycles()) {
-				Long[] ids = (Long[])processCycle.getPages().toArray();
-				Page<byte[]>[] pages = mmu.getPages(ids);
-				
+			for (ProcessCycle cycle : processCycles.getProcessCycles()) {	
+				Object pagesObject[] = cycle.getPages().toArray();
+				Long[] pagesIds = Arrays.copyOf(pagesObject, pagesObject.length, Long[].class);
+				Page<byte[]>[] pages = this.mmu.getPages(pagesIds);
 				for (int i = 0; i < pages.length; i++) {
-					pages[i].setContent(processCycle.getData().get(i));
+					pages[i].setContent(cycle.getData().get(i));
+					MMULogger.getInstance().write("GP:p"+this.getId()+" "+pages[i].getPageId()+" "+Arrays.toString(pages[i].getContent()), Level.INFO);
 				}
-				
-				Thread.sleep(processCycle.getSleepMs());
+
+				Thread.sleep(cycle.getSleepMs());
 			}
-			
 			return true;
 		} catch (Exception e) {
 			return false;
 		}
-	}
+		}
 
 	public int getId() {
 		return id;
