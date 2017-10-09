@@ -27,6 +27,7 @@ public class MemoryManagementUnit{
 		hardDisk = HardDisk.getInstance();
 		logger = MMULogger.getInstance();
 		logger.write("RC:" + ramCapacity + "\n", Level.INFO);
+		
 	}
 
 	/**
@@ -39,7 +40,7 @@ public class MemoryManagementUnit{
 	public synchronized Page<byte[]>[] getPages(Long[] pageIds) throws IOException{
 
 		Page<byte[]>[] result = new Page[pageIds.length];
-
+		System.out.println("Get Pages");
 		for (int i = 0; i < pageIds.length; i++) {
 			if (algo.getElement(pageIds[i]) == null) {
 				if (ram.getRAMSize() < ram.getInitialCapacity()) {
@@ -47,7 +48,9 @@ public class MemoryManagementUnit{
 					algo.putElement(pageIds[i],pageIds[i]);
 					// adding the missing page to the ram
 					result[i] = hardDisk.pageFault(pageIds[i]);
-					logger.write("PF " + pageIds[i]+ "\r\n", Level.INFO);
+					
+					logger.write("PF:" + pageIds[i]+ "\r\n", Level.INFO);
+					
 					ram.addPage(result[i]);
 				} else {
 					// adding the missing pageId to the ram algo
@@ -57,7 +60,8 @@ public class MemoryManagementUnit{
 					Page<byte[]> pageToHd = ram.getPage(pageIdToHd);
 					ram.removePage(pageToHd);
 					result[i] = hardDisk.pageReplacement(pageToHd, pageIds[i]);
-					logger.write("PR MTH " + pageIdToHd+" " + "MTR " + pageIds[i]+ "\r\n", Level.INFO);
+					logger.write("PR:MTH " + pageIdToHd+" " + "MTR " + pageIds[i]+ "\r\n", Level.INFO);
+					
 					ram.addPage(result[i]);
 				}
 			} else {
@@ -75,6 +79,7 @@ public class MemoryManagementUnit{
 		this.algo = algo;
 	}
 
+	
 	public void shutDown() throws FileNotFoundException, IOException
 	{	
 		Map<Long,Page<byte[]>> pages = ram.getPages();

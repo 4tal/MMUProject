@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Observable;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
-public class CLI extends Object implements Runnable {
+import com.hit.view.View;
+
+public class CLI extends Observable implements Runnable,View {
 	
 	private static final String NFU = "NFU";
 	private static final String LRU = "LRU";
@@ -33,7 +36,8 @@ public class CLI extends Object implements Runnable {
 		String input = null;
 		boolean goodInput = false;
 		boolean stop = false;
-		String[] command = new String[2];
+		String[] command = new String[3];
+		command[2]="None";
 		
 		write("Please type 'start' to start");
 		input = in.nextLine();
@@ -59,6 +63,7 @@ public class CLI extends Object implements Runnable {
 				algoName = input.split(" ")[0];
 				if(input.toUpperCase().equals(STOP)) {
 					stop = true;
+					command[2]="exit";
 					break;
 				}
 				
@@ -70,14 +75,15 @@ public class CLI extends Object implements Runnable {
 			} while (!goodInput);
 			
 			if(!stop) {
-				try {
-					MMUDriver.start(command);
-				} catch (InterruptedException | ExecutionException | IOException e) {
-					e.printStackTrace();
-				}
+				
+				setChanged();
+				notifyObservers(command);
+				//MMUDriver.start(command);
 			}
 		}
 		
+		setChanged();
+		notifyObservers(command);
 		write("Thank you");
 		in.close();
 		out.close();		
@@ -107,5 +113,12 @@ public class CLI extends Object implements Runnable {
 		}
 		
 		return success;
+	}
+
+
+	@Override
+	public void start() {
+		// TODO Auto-generated method stub
+		
 	}
 }
