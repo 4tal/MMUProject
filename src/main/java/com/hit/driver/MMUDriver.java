@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
@@ -22,6 +23,7 @@ import com.hit.memoryunits.MemoryManagementUnit;
 import com.hit.processes.Process;
 import com.hit.processes.ProcessCycles;
 import com.hit.processes.RunConfiguration;
+import com.hit.util.MMULogger;
 
 public class MMUDriver {
 	private static final String CONFIG_FILE = "src/main/resources/com/hit/config/Configuration.json";
@@ -53,6 +55,8 @@ public class MMUDriver {
 			id++;
 			processList.add(new Process(id, mmu, processCycles));
 		}
+		
+		MMULogger.getInstance().write("PN:" + processList.size() + "\n", Level.INFO);
 			
 		return processList;
 	}
