@@ -11,7 +11,7 @@ public class ProcessCycles {
 
 	@Override
 	public String toString() {
-		return "ProcessCycles [processCycles=" + processCycles + "]";
+		return processCycles.toString();
 	}
 
 	public List<ProcessCycle> getProcessCycles() {

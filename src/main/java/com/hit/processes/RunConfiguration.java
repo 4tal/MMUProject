@@ -20,6 +20,6 @@ public class RunConfiguration {
 
 	@Override
 	public String toString() {
-		return "RunConfiguration [processCycle=" + processesCycles + "]";
+		return processesCycles.toString();
 	}
 }

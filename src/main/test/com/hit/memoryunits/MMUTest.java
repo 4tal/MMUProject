@@ -27,8 +27,16 @@ public class MMUTest {
 			expectedPages[i] = new Page<>(val, val.toString().getBytes());
 			++val;
 		} 
-		for(int i = 0; i < returnPages.length; i++) {
-			assertEquals(expectedPages[i].getPageId(), returnPages[i].getPageId());
-		}
+		
+		assertEquals(expectedPages[0], returnPages[0]);
+		assertEquals(expectedPages[1], returnPages[1]);
+		assertEquals(expectedPages[2], returnPages[2]);
+		assertEquals(expectedPages[3], returnPages[3]);
+		assertEquals(expectedPages[4], returnPages[4]);
+		assertEquals(expectedPages[5], returnPages[5]);
+		assertEquals(expectedPages[6], returnPages[6]);
+		assertEquals(expectedPages[7], returnPages[7]);
+		assertEquals(expectedPages[8], returnPages[8]);
+	
 	}
 }

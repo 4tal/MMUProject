@@ -34,6 +34,7 @@ public final class HardDisk {
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.write(e.getMessage() + "\n", Level.SEVERE);
+			e.printStackTrace();
 		}
 	}
 
@@ -49,8 +50,11 @@ public final class HardDisk {
 	 * @throws IOException indicates problems accessing the HD
 	 */
 	public Page<byte[]> pageFault(Long pageId) throws FileNotFoundException, IOException {
-		readFromHD();
-		Page<byte[]> page = pagesOnHD.get(pageId);
+		Page<byte[]> page = null;
+		if(pagesOnHD.containsKey(pageId)) {
+			writeToHD();
+			page = pagesOnHD.get(pageId);
+		 }
 		
 		return page;
 	}
@@ -66,12 +70,16 @@ public final class HardDisk {
 	 * @throws FileNotFoundException indicates problems read from files that behave like HD
 	 */
 	public Page<byte[]> pageReplacement(Page<byte[]> moveToHdPage, Long moveToRamId) throws FileNotFoundException, IOException{
-		readFromHD();
+	
 		pagesOnHD.put(moveToHdPage.getPageId(), moveToHdPage);
-		Page<byte[]> pageReturn = pagesOnHD.get(moveToRamId);
+		Page<byte[]> page = null;
+		
+ 		if(pageFault(moveToRamId) != null) {
+ 			page = pageFault(moveToRamId);
+		}
 		writeToHD();
 		
-		return pageReturn;
+		return page;
 	}
 
 	private void writeToHD() throws FileNotFoundException, IOException {

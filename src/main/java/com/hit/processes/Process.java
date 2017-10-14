@@ -21,22 +21,25 @@ public class Process implements Callable<Boolean> {
 		setId(id);
 		this.mmu = mmu;
 		this.processCycles = processCycles;
+		this.logger = MMULogger.getInstance();
 	}
 	
 	@Override
 	public Boolean call() throws Exception {
 		try {
-			for(ProcessCycle processCycle : processCycles.getProcessCycles()) {
-				Long[] ids = (Long[])processCycle.getPages().toArray();
-				Page<byte[]>[] pages = mmu.getPages(ids);
+			for (ProcessCycle cycle : processCycles.getProcessCycles()) {
+				Object pagesObject[] = cycle.getPages().toArray();
+				Long[] pagesIds = Arrays.copyOf(pagesObject, pagesObject.length, Long[].class);
+				Page<byte[]>[] pages = this.mmu.getPages(pagesIds);
 				
-				logger.write("Suppose to write somthing elese - In process\r\n", Level.INFO);
-				
+				//logger.write("Suppose to write somthing elese - In process\r\n", Level.INFO);
+				//Maybe need to remove this 2 logger.write (up and down)
 				for (int i = 0; i < pages.length; i++) {
-					logger.write("GP:P"+this.id+" "+pages[i].getPageId() +" "+ Arrays.toString(processCycle.getData().toArray()) + "\r\n", Level.INFO);
-					pages[i].setContent(processCycle.getData().get(i));
+					//logger.write("GP:P"+this.id+" "+pages[i].getPageId() +" "+ Arrays.toString(processCycle.getData().toArray()) + "\r\n", Level.INFO);
+					pages[i].setContent(cycle.getData().get(i));
+					MMULogger.getInstance().write("GP:p"+this.getId()+" "+pages[i].getPageId()+" "+Arrays.toString(pages[i].getContent()) +"\n", Level.INFO);
 				}
-				Thread.sleep(processCycle.getSleepMs());
+				Thread.sleep(cycle.getSleepMs());
 			}
 			
 			return true;
