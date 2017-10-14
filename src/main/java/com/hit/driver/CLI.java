@@ -78,7 +78,6 @@ public class CLI extends Observable implements Runnable,View {
 				
 				setChanged();
 				notifyObservers(command);
-				//MMUDriver.start(command);
 			}
 		}
 		

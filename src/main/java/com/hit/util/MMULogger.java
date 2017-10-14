@@ -19,6 +19,10 @@ public class MMULogger {
 		}
 	}
 	
+	public void close(){
+		this.handler.close();
+	}
+	
 	public static MMULogger getInstance() {
 		if(instance==null){
 			instance= new MMULogger();

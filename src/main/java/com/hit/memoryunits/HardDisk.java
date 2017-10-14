@@ -93,14 +93,6 @@ public final class HardDisk {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private void readFromHD()  throws FileNotFoundException, IOException{
-		try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(DEAFAULT_FILE_NAME))) {
-			pagesOnHD = (HashMap<Long, Page<byte[]>>) inputStream.readObject();
-		} catch (ClassNotFoundException e) {
-			logger.write(e.getMessage(), Level.SEVERE);
-		}
-	}
 
 	//when clone method is override the singleton is more stronger because the singleton object(HardDisk) cannot be cloned
 	@Override

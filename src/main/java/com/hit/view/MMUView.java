@@ -9,26 +9,36 @@ public class MMUView extends Observable implements View {
 	JFrame frmMmuSimulator;
 	private JTable table_1;
 	boolean notInit = true;
+	String[] commandsToExe=null;
 	
+	
+
 	public MMUView(){
 		System.out.println("View Ctor started");
 		//System.out.println("View Started");
 		//need to make this command to active:
 		notInit=false;
-		start();
 	}
 	
 	private void createAndShowGUI(){
-		
+		System.out.println("Window is up");
 	}
 	
+	public void initialized(String[] inputCommands){
+		setCommandsToExe(inputCommands);
+		openWindow();
+	}
 	
-	
+	public void setCommandsToExe(String[] commandsToExe) {
+		this.commandsToExe = commandsToExe;
+	}
+
 	private void openWindow() {
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 
 			@Override
 			public void run() {
+				
 				createAndShowGUI();
 			}
 
@@ -38,8 +48,7 @@ public class MMUView extends Observable implements View {
 	
 	@Override
 	public void start() {
-		System.out.println("View start started");
-		// TODO Auto-generated method stub
+		openWindow();
 		
 	}
 
