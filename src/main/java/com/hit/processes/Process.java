@@ -32,12 +32,9 @@ public class Process implements Callable<Boolean> {
 				Long[] pagesIds = Arrays.copyOf(pagesObject, pagesObject.length, Long[].class);
 				Page<byte[]>[] pages = this.mmu.getPages(pagesIds);
 				
-				//logger.write("Suppose to write somthing elese - In process\r\n", Level.INFO);
-				//Maybe need to remove this 2 logger.write (up and down)
 				for (int i = 0; i < pages.length; i++) {
-					//logger.write("GP:P"+this.id+" "+pages[i].getPageId() +" "+ Arrays.toString(processCycle.getData().toArray()) + "\r\n", Level.INFO);
 					pages[i].setContent(cycle.getData().get(i));
-					MMULogger.getInstance().write("GP:p"+this.getId()+" "+pages[i].getPageId()+" "+Arrays.toString(pages[i].getContent()) +"\n", Level.INFO);
+					MMULogger.getInstance().write("GP:P"+this.getId()+" "+pages[i].getPageId()+" "+Arrays.toString(pages[i].getContent()) +"\n", Level.INFO);
 				}
 				Thread.sleep(cycle.getSleepMs());
 			}
