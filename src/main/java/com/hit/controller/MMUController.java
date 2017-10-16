@@ -58,7 +58,7 @@ public class MMUController implements Controller,Observer {
 			//Finished the log file creation and VIEW initialization:
 			MMUView newView = (MMUView)view;
 			//when finish with FUNFUN comment out:
-			//newView.setParameters(arg1);
+			newView.setParameters(arg1);
 		}
 		
 	}
