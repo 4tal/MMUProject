@@ -14,28 +14,51 @@ public class ProcessCycle {
 		setSleepMs(sleepMs);
 	}
 
+	/**
+	 * 
+	 * @return the pages in the process cycle
+	 */
 	public List<Long> getPages() {
 		return pages;
 	}
 
+	/**
+	 * 
+	 * @param pages the pages to set in the process cycle
+	 */
 	public void setPages(List<Long> pages) {
 		this.pages = pages;
 	}
 
+	/**
+	 * 
+	 * @return the data of the process cycle
+	 */
 	public List<byte[]> getData() {
 		return data;
 	}
 
+	/**
+	 * 
+	 * @param data the data to set to process cycle
+	 */
 	public void setData(List<byte[]> data) {
 		this.data = data;
 	}
 	
 	
-
+	/**
+	 * 
+	 * @return the sleep time in ms of the process cycle
+	 */
 	public int getSleepMs() {
 		return sleepMs;
 	}
 
+	/**
+	 * 
+	 * @param sleepMs the sleep time in ms for the process cycle to sleep
+	 */
 	public void setSleepMs(int sleepMs) {
 		this.sleepMs = sleepMs;
 	}

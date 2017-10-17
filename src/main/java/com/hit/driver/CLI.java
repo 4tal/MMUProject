@@ -1,16 +1,19 @@
 package com.hit.driver;
 
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Observable;
 import java.util.Scanner;
-import java.util.concurrent.ExecutionException;
 
 import com.hit.view.View;
 
+/**
+ * 
+ * @author Aviad and Idan
+ * CLI class represent the Command Line Interface for the MMU Simulator
+ */
 public class CLI extends Observable implements Runnable,View {
 	
 	private static final String NFU = "NFU";
@@ -88,6 +91,11 @@ public class CLI extends Observable implements Runnable,View {
 		out.close();		
 	}
 	
+	/**
+	 * 
+	 * @param source String to parse to integer
+	 * @return indicates if the parsing succeeded
+	 */
 	private boolean tryParseInt(String source) {
 		try {
 			Integer.parseInt(source);
@@ -97,12 +105,21 @@ public class CLI extends Observable implements Runnable,View {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param string the for the output
+	 */
 	public void write(String string)
 	{
 		out.println(string);
 		out.flush();
 	}
 	
+	/**
+	 * 
+	 * @param algoName the name of the algorithm that will be checked- NFU|LRU|RANDOM 
+	 * @return indicates if the String is valid aglo name
+	 */
 	private boolean isCorrectAlgoCommand(String algoName) {
 		boolean success = false;
 		algoName = algoName.toUpperCase();

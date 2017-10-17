@@ -1,6 +1,7 @@
 package com.hit.model;
 
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -8,13 +9,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.stream.JsonReader;
 import com.hit.algorithms.IAlgoCache;
 import com.hit.algorithms.LRUAlgoCacheImpl;
 import com.hit.algorithms.NFUAlgoCacheImpl;
-import com.hit.algorithms.Random;
-import com.hit.driver.MMUDriver;
+import com.hit.algorithms.RandomAlgoCacheImpl;
 import com.hit.memoryunits.MemoryManagementUnit;
 import com.hit.processes.Process;
 import com.hit.processes.ProcessCycles;
@@ -28,10 +35,10 @@ public class MMUModel extends Observable implements Model{
 	private static MMULogger logger = MMULogger.getInstance();
 	private List<String> rowsFromLog;
 	private final String FILE_LOCATION= "logs/log.txt";
+	private static final String CONFIG_FILE = "src/main/resources/com/hit/config/Configuration.json";
 	
 	
 	public MMUModel(){
-		//MMUDriver.start();
 		rowsFromLog=new ArrayList<>();
 		
 		
@@ -46,7 +53,6 @@ public class MMUModel extends Observable implements Model{
 		try {
 			rowsFromLog.addAll(Files.readAllLines(Paths.get(FILE_LOCATION)));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -60,7 +66,7 @@ public class MMUModel extends Observable implements Model{
 			algoToExe = new LRUAlgoCacheImpl<>(capacity);
 			break;
 		case "RANDOM":
-			algoToExe = new Random<>(capacity);
+			algoToExe = new RandomAlgoCacheImpl<>(capacity);
 			break;
 		default:
 			break;
@@ -69,27 +75,27 @@ public class MMUModel extends Observable implements Model{
 		return algoToExe;
 	}
 
+	/**
+	 * @see Model#start()
+	 */
 	@Override
 	public void start() {
 		MemoryManagementUnit mmu = new MemoryManagementUnit(capacityForAlgo, algoToExe);
-		RunConfiguration runConfiguration = MMUDriver.readConfigurationFile();
+		RunConfiguration runConfiguration = readConfigurationFile();
 		List<ProcessCycles> processCycles = runConfiguration.getProcessCycles();
-		List<Process> processes = MMUDriver.createProcesses(processCycles, mmu);
+		List<Process> processes = createProcesses(processCycles, mmu);
 		
 		logger.write("PN:" + processes.size() + "\n", Level.INFO);
 		try {
-			MMUDriver.runProcesses(processes);
+			runProcesses(processes);
 		} catch (InterruptedException | ExecutionException e) {
 			logger.write(e.getMessage() + "\n", Level.SEVERE);
 		}
 		
-		
-		//Write to HD
 		try {
 			mmu.shutDown();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.write(e.getMessage() + "\n", Level.SEVERE);
 		}
 		
 		readAllLog();
@@ -97,11 +103,63 @@ public class MMUModel extends Observable implements Model{
 		
 		
 		notifyObservers(rowsFromLog);
-		
-		
-		
-		
+			
 	}
 
+	/**
+	 * read the json configurations file and return RunConfiguration file
+	 * @return
+	 */
+	public static RunConfiguration readConfigurationFile() {
+		RunConfiguration runConfiguration = null;
+		FileReader fileReader = null;
+		
+		try {
+			fileReader = new FileReader(CONFIG_FILE);
+			Gson gson = new Gson();
+			runConfiguration = gson.fromJson(new JsonReader(fileReader), RunConfiguration.class);
+			
+		} catch (FileNotFoundException | JsonIOException | JsonSyntaxException e) {
+			logger.write(e.getMessage() + "\n", Level.SEVERE);
+		}
+		
+		return runConfiguration;
+	}
 	
+	/**
+	 * 
+	 * @param appliocationsScenarios List of ProcessCycles
+	 * @param mmu the MMU 
+	 * @return List of created Processes
+	 */
+	public static List<Process> createProcesses(List<ProcessCycles> appliocationsScenarios, MemoryManagementUnit mmu) {
+		List<Process> processList = new ArrayList<>();
+		int id = 0;
+		for(ProcessCycles processCycles : appliocationsScenarios) {
+			id++;
+			processList.add(new Process(id, mmu, processCycles));
+		}
+			
+		return processList;
+	}
+	
+	/**
+	 * 
+	 * @param applications The List of Processes to run
+	 * @throws InterruptedException indicates that another thread interrupt this operation
+	 * @throws ExecutionException indicates problems to execute this operation in a Thread
+	 */
+	public static void runProcesses(List<Process> applications) throws InterruptedException, ExecutionException {
+		ExecutorService executer = Executors.newCachedThreadPool();
+		Future<Boolean> futures[] = new Future[applications.size()];
+		
+		for (int i = 0; i < futures.length; i++) {
+			futures[i] = executer.submit(applications.get(i));
+		}
+		
+		executer.shutdown();
+		for(int i = 0; i < applications.size(); ++i) {
+			System.out.println(String.format("process %d : %s", applications.get(i).getId(), futures[i].get()));
+		}
+	}
 }

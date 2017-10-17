@@ -5,12 +5,14 @@ import java.awt.Insets;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
 
+import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
@@ -25,7 +27,6 @@ import javax.swing.table.DefaultTableModel;
 
 public class MMUView extends Observable implements View {
 	JFrame frmMmuSimulator;
-	private JTable table_1;
 	private List<String> rowsFromLog=null;
 	private List<String> getPagesFromLogList=null;
 	private List<String> otherCommandFromLogList=null;
@@ -54,6 +55,9 @@ public class MMUView extends Observable implements View {
 		freeColumns=new ArrayList();
 	}
 	
+	/**
+	 * initialize the components and show the view
+	 */
 	private void createAndShowGUI(){
 		frmMmuSimulator = new JFrame();
 		frmMmuSimulator.setMinimumSize(new Dimension(600, 300));
@@ -62,6 +66,12 @@ public class MMUView extends Observable implements View {
 		frmMmuSimulator.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmMmuSimulator.getContentPane().setLayout(null);
 		frmMmuSimulator.setResizable(false);
+		try {
+			frmMmuSimulator.setIconImage(ImageIO.read(new File("resources\\ram.png")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		
 		JPanel playAndAll = new JPanel();
 		playAndAll.setBackground(UIManager.getColor("CheckBox.background"));
@@ -69,47 +79,34 @@ public class MMUView extends Observable implements View {
 		frmMmuSimulator.getContentPane().add(playAndAll);
 		playAndAll.setLayout(null);
 		
-		
-		
-		
-
-		//Add items to the list............................................................................
 		list = new JList();
 		DefaultListModel listOfProcessesModel=new DefaultListModel();
+		
 		for(int i=0;i<numberOfProcesses;i++){
 			listOfProcessesModel.addElement("Process "+ (i+1));
 		}
+		
 		list.setModel(listOfProcessesModel);
 		list.setVisible(true);
 		
-		
-		//Create the action listener for this button:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`
 		JButton btnPlay = new JButton("Play");
 		btnPlay.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent arg0) {	
 				updateActiveProcesses(list.getSelectedIndices());
-				//System.out.println(getPagesFromLogList);
-				//System.out.println(otherCommandFromLogList);
 				executeNextCommand();
-			}
-
-			
+			}	
 		});
 		btnPlay.setBounds(10, 24, 67, 23);
 		playAndAll.add(btnPlay);
-
-		
-		
-		
-		
-		//Create the action listener for this button:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`
 		JButton btnNewButton = new JButton("Play All");
+		
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				executeAllCommands();
 			}
 		});
+		
 		btnNewButton.setBounds(109, 24, 81, 23);
 		playAndAll.add(btnNewButton);
 		
@@ -153,13 +150,13 @@ public class MMUView extends Observable implements View {
 		panel_1.add(txtpnPageReplacementAmount);
 		
 		
-		//Update Page Fault amount:~~~~~~How to notify this component of change in state~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`
+		//Update Page Fault amount:
 		editorPane = new JEditorPane();
 		editorPane.setText(pageFaults.toString());
 		editorPane.setBounds(174, 24, 21, 20);
 		panel_1.add(editorPane);
 		
-		//Update Page replacement amount:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`
+		//Update Page replacement amount:
 		editorPane_1 = new JEditorPane();
 		editorPane_1.setText(pageReplacements.toString());
 		editorPane_1.setBounds(174, 47, 21, 20);
@@ -183,9 +180,13 @@ public class MMUView extends Observable implements View {
 		
 		frmMmuSimulator.getContentPane().add(scrollPane);
 		frmMmuSimulator.setVisible(true);
-		System.out.println(rowsFromLog);
 	}
 	
+	/**
+	 * 
+	 * @param arg1 set parameters to show in the view
+	 */
+	@SuppressWarnings("unchecked")
 	public void setParameters(Object arg1) {
 		otherCommandFromLogList=new ArrayList<>();
 		getPagesFromLogList=new ArrayList<>();
@@ -197,6 +198,10 @@ public class MMUView extends Observable implements View {
 		setNumberOfProcesses(Integer.parseInt(rowsFromLog.get(1).substring(3)));
 	}
 	
+	/**
+	 * 
+	 * @param active the id's of the active/selected processes
+	 */
 	protected void updateActiveProcesses(int[] active) {
 		activeProcesses.clear();
 		for (int i=0;i<active.length;i++) {
@@ -205,6 +210,9 @@ public class MMUView extends Observable implements View {
 		
 	}
 	
+	/**
+	 * read all the GP commands from log file to data structure
+	 */
 	private void getAllPagesFromLog() {
 		for(int i = 2; i < rowsFromLog.size(); i++) {
 			if(validateCommand("GP", i)) {
@@ -214,8 +222,6 @@ public class MMUView extends Observable implements View {
 				int startIdx = rowsFromLog.get(i).indexOf("[") + 1;
 	            int endIdx = rowsFromLog.get(i).indexOf("]");
 	            String numbersArray = rowsFromLog.get(i).substring(startIdx, endIdx).replace(",","");
-	            //String[] numbers = numbersArray.split(",");
-				//allGetPagesFromRam.put(procId+" "+pageId, numbers);
 	            getPagesFromLogList.add(procId+" "+pageId+" "+numbersArray);
 			}
 			else{
@@ -223,16 +229,25 @@ public class MMUView extends Observable implements View {
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 * @param command the command to check
+	 * @param lineNumber the line number of the command
+	 * @return indicates if the command is valid
+	 */
 	private boolean validateCommand(String command, int lineNumber) {
         return rowsFromLog.get(lineNumber).contains(command);
     }
 	
+	/**
+	 * execute the next command in the log file
+	 */
 	protected void executeNextCommand() {
 		if(currCommand<otherCommandFromLogList.size()){
 			Integer tempProcessNumber=Integer.parseInt(getPagesFromLogList.get(currCommand).split(" ")[0]);
 			updateActiveProcesses(getListOfProcesses().getSelectedIndices());
 			if(otherCommandFromLogList.get(currCommand).contains("PF") && activeProcesses.contains(tempProcessNumber)){
-				System.out.println("PF");
 				int temp=getNextFreeCol();
 				setTheWholeColumn(temp);
 				updatePageFault();
@@ -245,30 +260,50 @@ public class MMUView extends Observable implements View {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param page the number(id) of the page
+	 * @return the column of the page is stored
+	 */
 	protected int findColIndexByPage(int page){
 		for(int i=0;i<capacitySize;i++){
-			if(Integer.parseInt(getTable().getTableHeader().getColumnModel().getColumn(i).getHeaderValue().toString())==page){
+			if(Integer.parseInt(table.getTableHeader().getColumnModel().getColumn(i).getHeaderValue().toString())==page){
 				return i;
 			}
 		}
 		return 0;
 	}
+	
+	/**
+	 * update the pages fault amount in the view
+	 */
 	protected void updatePageFault() {
 		setPageFaults(getPageFaults()+1);
 		getEditorPanePageFault().setText(String.valueOf(getPageFaults()));
 	}
 	
+	/**
+	 * update the page replacement amount in the view
+	 */
 	protected void updatePageReplacement() {
 		setPageReplacements(pageReplacements+1);
 		getEditorPanePageReplacement().setText(String.valueOf(getPageReplacements()));
 		
 	}
 
+	/**
+	 * run all the commands one after the other
+	 */
 	protected void executeAllCommands() {
 		for(int i=0;i<rowsFromLog.size();i++){
 			executeNextCommand();
 		}
 	}
+	
+	/**
+	 * 
+	 * @return get the next column the is not in use
+	 */
 	private int getNextFreeCol() {
 		int temp=0;
 		
@@ -279,9 +314,12 @@ public class MMUView extends Observable implements View {
 		return temp;
 	}
 	
+	/**
+	 * 
+	 * @param ColToEdit the column number in the view that will be edited
+	 */
 	private void setTheWholeColumn(int ColToEdit) {
-		List temp=new ArrayList();
-		getTable().getTableHeader().getColumnModel().getColumn(ColToEdit).setHeaderValue(getPagesFromLogList.get(currCommand).split(" ")[1]);
+		table.getTableHeader().getColumnModel().getColumn(ColToEdit).setHeaderValue(getPagesFromLogList.get(currCommand).split(" ")[1]);
 		table.getTableHeader().repaint();
 		
 		for(int i=0;i<5;i++){
@@ -291,11 +329,9 @@ public class MMUView extends Observable implements View {
 		table.repaint();
 	}
 	
-	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	public void initialized(){
 		openWindow();
 	}
-	
 	
 	
 	private void openWindow() {
@@ -303,25 +339,20 @@ public class MMUView extends Observable implements View {
 
 			@Override
 			public void run() {
-				
 				createAndShowGUI();
-			}
-
-			
+			}	
 		});
 	}
 	
+	/**
+	 * @see View#start()
+	 */
 	@Override
 	public void start() {
 		openWindow();
 		
 	}
 
-	
-	protected JTable getTable() {
-		return table;
-	}
-	
 	public int getPageFaults() {
 		return pageFaults;
 	}
@@ -353,6 +384,7 @@ public class MMUView extends Observable implements View {
 	public void setNumberOfProcesses(int numberOfProcesses) {
 		this.numberOfProcesses = numberOfProcesses;
 	}
+	
 	public JList getListOfProcesses() {
 		return list;
 	}

@@ -39,8 +39,6 @@ public class MemoryManagementUnit{
 
 		Page<byte[]>[] pages = new Page[pageIds.length];
 		
-		System.out.println("Get Pages");
-		
 		for (int i = 0; i < pageIds.length; i++) {
 			if(algo.getElement(pageIds[i]) != null) { //page exist in RAM
  					pages[i] = ram.getPage(pageIds[i]);
@@ -72,7 +70,12 @@ public class MemoryManagementUnit{
 		this.algo = algo;
 	}
 
-	
+	/**
+	 * 
+	 * @throws FileNotFoundException indicated problems to finding the file
+	 * @throws IOException indicates problems while writing to the file
+	 * this method for saving pages that still in the RAM but still not saved to the HardDisk
+	 */
 	public void shutDown() throws FileNotFoundException, IOException
 	{	
 		Map<Long,Page<byte[]>> pages = ram.getPages();

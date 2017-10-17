@@ -6,7 +6,12 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-public class MMULogger {
+/**
+ * 
+ * @author Aviad and Idan
+ * MMULogger write in log file (.txt), this class is singleton
+ */
+public final class MMULogger {
 	private final static String DEFAULT_FILE_NAME = "logs/log.txt";
 	private FileHandler handler;
 	private static MMULogger instance =null;
@@ -23,6 +28,10 @@ public class MMULogger {
 		this.handler.close();
 	}
 	
+	/**
+	 * 
+	 * @return Instance of the singleton MMULogger
+	 */
 	public static MMULogger getInstance() {
 		if(instance==null){
 			instance= new MMULogger();
@@ -30,6 +39,11 @@ public class MMULogger {
 		return instance;
 	}
 	
+	/**
+	 * 
+	 * @param command the command to write to log file
+	 * @param level use just SERVE/INFO- SEVERE is a message level indicating a serious failure. INFO is a message level for informational messages.
+	 */
 	public synchronized void write(String command, Level level) {
 		LogRecord logRecord = new LogRecord(level, command);
 		handler.setFormatter(new OnlyMessageFormatter());
@@ -50,6 +64,9 @@ public class MMULogger {
 		
 	}
 	
+	/**
+	 * override to keep the singleton safe from cloning
+	 */
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		throw new CloneNotSupportedException();

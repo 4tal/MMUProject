@@ -21,7 +21,6 @@ public class Process implements Callable<Boolean> {
 		setId(id);
 		this.mmu = mmu;
 		this.processCycles = processCycles;
-		this.logger = MMULogger.getInstance();
 	}
 	
 	@Override
@@ -34,7 +33,7 @@ public class Process implements Callable<Boolean> {
 				
 				for (int i = 0; i < pages.length; i++) {
 					pages[i].setContent(cycle.getData().get(i));
-					MMULogger.getInstance().write("GP:P"+this.getId()+" "+pages[i].getPageId()+" "+Arrays.toString(pages[i].getContent()) +"\n", Level.INFO);
+					logger.write("GP:P"+this.getId()+" "+pages[i].getPageId()+" "+Arrays.toString(pages[i].getContent()) +"\n", Level.INFO);
 				}
 				Thread.sleep(cycle.getSleepMs());
 			}

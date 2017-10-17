@@ -1,10 +1,8 @@
 package com.hit.memoryunits;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +10,11 @@ import java.util.logging.Level;
 
 import com.hit.util.MMULogger;
 
+/**
+ * 
+ * @author Aviad and Idan
+ * this class simulates as the Hard Disk of the MMU simulator, implemented as a singleton
+ */
 public final class HardDisk {
 
 	private static final int SIZE = 1000;
@@ -38,6 +41,10 @@ public final class HardDisk {
 		}
 	}
 
+	/**
+	 * 
+	 * @return get the single instance of the HardDiks- singleton
+	 */
 	public static HardDisk getInstance() {
 		return instance;
 	}
@@ -94,7 +101,9 @@ public final class HardDisk {
 	}
 
 
-	//when clone method is override the singleton is more stronger because the singleton object(HardDisk) cannot be cloned
+	/**
+	 * override to keep the singleton safe from cloning
+	 */
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		throw new CloneNotSupportedException();

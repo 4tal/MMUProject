@@ -4,6 +4,11 @@ package com.hit.memoryunits;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 
+ * @author Aviad and Idan
+ * The RAM class represent the ram in the MMU Simulator
+ */
 public class RAM {
 
 	private int initialCapacity;
