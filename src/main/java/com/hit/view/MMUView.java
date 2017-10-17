@@ -6,6 +6,7 @@ import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
@@ -36,6 +37,7 @@ public class MMUView extends Observable implements View {
 	private int numberOfProcesses;
 	private HashSet activeProcesses=null;
 	private ArrayList freeColumns=null;
+	private int currCommand=0;
 	
 	
 
@@ -85,10 +87,11 @@ public class MMUView extends Observable implements View {
 		JButton btnPlay = new JButton("Play");
 		btnPlay.addActionListener(new ActionListener() {
 			
-			
 			public void actionPerformed(ActionEvent arg0) {	
 				updateActiveProcesses(list.getSelectedIndices());
-				//executeNextCommand();
+				//System.out.println(getPagesFromLogList);
+				//System.out.println(otherCommandFromLogList);
+				executeNextCommand();
 			}
 
 			
@@ -104,10 +107,7 @@ public class MMUView extends Observable implements View {
 		JButton btnNewButton = new JButton("Play All");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("In play all: ");
-				//executeAllCommands();
-				System.out.println(list.getSelectionModel());
-				
+				executeAllCommands();
 			}
 		});
 		btnNewButton.setBounds(109, 24, 81, 23);
@@ -168,8 +168,8 @@ public class MMUView extends Observable implements View {
 
 
 		
-		String[] cols={"0","0","0","0"};
-		String[][] data={{"0","0","0","0"},{"0","0","0","0"},{"0","0","0","0"},{"0","0","0","0"},{"0","0","0","0"}};
+		String[] cols={"0","0","0","0","0","0","0","0","0","0","0","0"};
+		String[][] data={{"0","0","0","0","0","0","0","0","0","0","0","0"},{"0","0","0","0","0","0","0","0","0","0","0","0"},{"0","0","0","0","0","0","0","0","0","0","0","0"},{"0","0","0","0","0","0","0","0","0","0","0","0"},{"0","0","0","0","0","0","0","0","0","0","0","0"}};
 		tableModel =new DefaultTableModel(data,cols);
 		table = new JTable(tableModel);
 	
@@ -222,38 +222,81 @@ public class MMUView extends Observable implements View {
 				otherCommandFromLogList.add(rowsFromLog.get(i));
 			}
 		}
-		
-		
-		
-		/*for(int i=0;i<getPagesCommands.size();i++){
-			System.out.println(getPagesCommands.get(i));
-		}*/
-		
-		
-//		for(Map.Entry<String, String[]> entry: allGetPagesFromRam.entrySet()) {
-//			System.out.println("key " + entry.getKey());
-//			for(int i = 0; i < entry.getValue().length; i++) {
-//				System.out.print(entry.getValue()[i]);
-//			}
-/*//			System.out.println();
-//		}
-		System.out.println(otherCommands);*/
-		
 	}
 	private boolean validateCommand(String command, int lineNumber) {
         return rowsFromLog.get(lineNumber).contains(command);
     }
 	
+	protected void executeNextCommand() {
+		if(currCommand<otherCommandFromLogList.size()){
+			Integer tempProcessNumber=Integer.parseInt(getPagesFromLogList.get(currCommand).split(" ")[0]);
+			updateActiveProcesses(getListOfProcesses().getSelectedIndices());
+			if(otherCommandFromLogList.get(currCommand).contains("PF") && activeProcesses.contains(tempProcessNumber)){
+				System.out.println("PF");
+				int temp=getNextFreeCol();
+				setTheWholeColumn(temp);
+				updatePageFault();
+			}
+			else if(otherCommandFromLogList.get(currCommand).contains("PR") && activeProcesses.contains(tempProcessNumber)){
+				setTheWholeColumn(findColIndexByPage(Integer.parseInt(otherCommandFromLogList.get(currCommand).split(" ")[2])));
+				updatePageReplacement();
+			}
+			currCommand++;
+		}
+	}
 	
+	protected int findColIndexByPage(int page){
+		for(int i=0;i<capacitySize;i++){
+			if(Integer.parseInt(getTable().getTableHeader().getColumnModel().getColumn(i).getHeaderValue().toString())==page){
+				return i;
+			}
+		}
+		return 0;
+	}
+	protected void updatePageFault() {
+		setPageFaults(getPageFaults()+1);
+		getEditorPanePageFault().setText(String.valueOf(getPageFaults()));
+	}
 	
+	protected void updatePageReplacement() {
+		setPageReplacements(pageReplacements+1);
+		getEditorPanePageReplacement().setText(String.valueOf(getPageReplacements()));
+		
+	}
+
+	protected void executeAllCommands() {
+		for(int i=0;i<rowsFromLog.size();i++){
+			executeNextCommand();
+		}
+	}
+	private int getNextFreeCol() {
+		int temp=0;
+		
+		if(freeColumns.size()>0){
+			temp=(int) freeColumns.get(0);
+			freeColumns.remove(0);
+		}
+		return temp;
+	}
 	
-	
-	
+	private void setTheWholeColumn(int ColToEdit) {
+		List temp=new ArrayList();
+		getTable().getTableHeader().getColumnModel().getColumn(ColToEdit).setHeaderValue(getPagesFromLogList.get(currCommand).split(" ")[1]);
+		table.getTableHeader().repaint();
+		
+		for(int i=0;i<5;i++){
+			tableModel.setValueAt(getPagesFromLogList.get(currCommand).split(" ")[2+i],i, ColToEdit);
+		}	
+		table.setModel(tableModel);
+		table.repaint();
+	}
 	
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	public void initialized(){
 		openWindow();
 	}
+	
+	
 	
 	private void openWindow() {
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -274,6 +317,11 @@ public class MMUView extends Observable implements View {
 		
 	}
 
+	
+	protected JTable getTable() {
+		return table;
+	}
+	
 	public int getPageFaults() {
 		return pageFaults;
 	}
@@ -305,4 +353,14 @@ public class MMUView extends Observable implements View {
 	public void setNumberOfProcesses(int numberOfProcesses) {
 		this.numberOfProcesses = numberOfProcesses;
 	}
+	public JList getListOfProcesses() {
+		return list;
+	}
+	protected JEditorPane getEditorPanePageFault() {
+		return editorPane;
+	}
+	protected JEditorPane getEditorPanePageReplacement() {
+		return editorPane_1;
+	}
+	
 }
