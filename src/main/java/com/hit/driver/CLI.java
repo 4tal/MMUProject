@@ -31,7 +31,7 @@ public class CLI extends Observable implements Runnable,View {
 	
 	
 	@Override
-	public void run() {
+	public void start() {
 		String algoName = null;
 		String input = null;
 		boolean goodInput = false;
@@ -116,8 +116,8 @@ public class CLI extends Observable implements Runnable,View {
 
 
 	@Override
-	public void start() {
-		// TODO Auto-generated method stub
+	public void run() {
+		start();
 		
 	}
 }

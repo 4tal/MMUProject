@@ -26,6 +26,10 @@ public class MMUView extends Observable implements View {
 	JFrame frmMmuSimulator;
 	private JTable table_1;
 	private List<String> rowsFromLog=null;
+	private List<String> getPagesFromLogList=null;
+	private List<String> otherCommandFromLogList=null;
+	
+	
 	private Integer pageFaults=0;
 	private Integer pageReplacements=0;
 	private int capacitySize;
@@ -40,16 +44,15 @@ public class MMUView extends Observable implements View {
 	private JList list;
 	DefaultTableModel tableModel;
 	private JTable table;
+	private String[] cols;
+	private String[][] data;
 	
 	public MMUView(){
-		
+		activeProcesses=new HashSet();
+		freeColumns=new ArrayList();
 	}
 	
 	private void createAndShowGUI(){
-		
-		
-		
-		
 		frmMmuSimulator = new JFrame();
 		frmMmuSimulator.setMinimumSize(new Dimension(600, 300));
 		frmMmuSimulator.setTitle("MMU Simulator");
@@ -82,13 +85,10 @@ public class MMUView extends Observable implements View {
 		JButton btnPlay = new JButton("Play");
 		btnPlay.addActionListener(new ActionListener() {
 			
-			public void actionPerformed(ActionEvent arg0) {
-				
-				//updateActiveProcesses(list.getSelectedIndices());
-				
+			
+			public void actionPerformed(ActionEvent arg0) {	
+				updateActiveProcesses(list.getSelectedIndices());
 				//executeNextCommand();
-				
-				
 			}
 
 			
@@ -187,17 +187,62 @@ public class MMUView extends Observable implements View {
 	}
 	
 	public void setParameters(Object arg1) {
+		otherCommandFromLogList=new ArrayList<>();
+		getPagesFromLogList=new ArrayList<>();
 		rowsFromLog=(List<String>) arg1;
 		setPageFaults(0);
 		setPageReplacements(0);
-		
-		
-		setCapacitySize(Character.getNumericValue((rowsFromLog.get(0).charAt(3))));
-		setNumberOfProcesses(Character.getNumericValue((rowsFromLog.get(1).charAt(3))));
-		activeProcesses=new HashSet();
-		freeColumns=new ArrayList();
+		getAllPagesFromLog();
+		setCapacitySize(Integer.parseInt(rowsFromLog.get(0).substring(3)));
+		setNumberOfProcesses(Integer.parseInt(rowsFromLog.get(1).substring(3)));
+	}
+	
+	protected void updateActiveProcesses(int[] active) {
+		activeProcesses.clear();
+		for (int i=0;i<active.length;i++) {
+			activeProcesses.add(active[i]+1);
+		}
 		
 	}
+	
+	private void getAllPagesFromLog() {
+		for(int i = 2; i < rowsFromLog.size(); i++) {
+			if(validateCommand("GP", i)) {
+				String[] fragments = rowsFromLog.get(i).split(" ");
+				String procId =fragments[0].substring(4);
+				String pageId= fragments[1];
+				int startIdx = rowsFromLog.get(i).indexOf("[") + 1;
+	            int endIdx = rowsFromLog.get(i).indexOf("]");
+	            String numbersArray = rowsFromLog.get(i).substring(startIdx, endIdx).replace(",","");
+	            //String[] numbers = numbersArray.split(",");
+				//allGetPagesFromRam.put(procId+" "+pageId, numbers);
+	            getPagesFromLogList.add(procId+" "+pageId+" "+numbersArray);
+			}
+			else{
+				otherCommandFromLogList.add(rowsFromLog.get(i));
+			}
+		}
+		
+		
+		
+		/*for(int i=0;i<getPagesCommands.size();i++){
+			System.out.println(getPagesCommands.get(i));
+		}*/
+		
+		
+//		for(Map.Entry<String, String[]> entry: allGetPagesFromRam.entrySet()) {
+//			System.out.println("key " + entry.getKey());
+//			for(int i = 0; i < entry.getValue().length; i++) {
+//				System.out.print(entry.getValue()[i]);
+//			}
+/*//			System.out.println();
+//		}
+		System.out.println(otherCommands);*/
+		
+	}
+	private boolean validateCommand(String command, int lineNumber) {
+        return rowsFromLog.get(lineNumber).contains(command);
+    }
 	
 	
 	
@@ -260,9 +305,4 @@ public class MMUView extends Observable implements View {
 	public void setNumberOfProcesses(int numberOfProcesses) {
 		this.numberOfProcesses = numberOfProcesses;
 	}
-
-	
-
-	
-
 }

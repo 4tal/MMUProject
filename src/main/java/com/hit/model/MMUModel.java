@@ -94,6 +94,8 @@ public class MMUModel extends Observable implements Model{
 		
 		readAllLog();
 		setChanged();
+		
+		
 		notifyObservers(rowsFromLog);
 		
 		
