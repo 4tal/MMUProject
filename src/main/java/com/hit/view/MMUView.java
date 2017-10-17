@@ -1,46 +1,11 @@
 package com.hit.view;
 
 import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Insets;
-import java.awt.SystemColor;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-
-
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JEditorPane;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextPane;
-
-import javax.swing.UIManager;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-
-
-
-
-
-
-import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Insets;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
@@ -56,14 +21,8 @@ import javax.swing.JTable;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-
-import com.hit.controller.MMUController;
-import com.hit.driver.CLI;
-import com.hit.model.MMUModel;
 
 public class MMUView extends Observable implements View {
-	private static final String CONFIG_FILE = "src/main/resources/com/hit/config/Configuration.json";
 	JFrame frmMmuSimulator;
 	private JTable table_1;
 	private List<String> rowsFromLog=null;
@@ -73,46 +32,31 @@ public class MMUView extends Observable implements View {
 	private int numberOfProcesses;
 	private HashSet activeProcesses=null;
 	private ArrayList freeColumns=null;
-	private int rowsFromLogIndex=2;
+	
+	
+
 	private JEditorPane editorPane;
 	private JEditorPane editorPane_1;
 	private JList list;
 	DefaultTableModel tableModel;
 	private JTable table;
-	private ArrayList freeColuumns;
-	private String currentCommand=null;
-	private int sizeOfPage=5;
 	
-	public static void main(String[] args) {
-		MMUView window = new MMUView();
-		window.frmMmuSimulator.setVisible(true);
-		
-		
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
 	public MMUView(){
-		System.out.println("View Ctor started");
-		initialized();
-
+		
 	}
 	
 	private void createAndShowGUI(){
-		System.out.println("Window is up");
+		
+		
+		
+		
 		frmMmuSimulator = new JFrame();
 		frmMmuSimulator.setMinimumSize(new Dimension(600, 300));
 		frmMmuSimulator.setTitle("MMU Simulator");
 		frmMmuSimulator.setBounds(100, 100, 450, 300);
 		frmMmuSimulator.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmMmuSimulator.getContentPane().setLayout(null);
+		frmMmuSimulator.setResizable(false);
 		
 		JPanel playAndAll = new JPanel();
 		playAndAll.setBackground(UIManager.getColor("CheckBox.background"));
@@ -121,14 +65,15 @@ public class MMUView extends Observable implements View {
 		playAndAll.setLayout(null);
 		
 		
+		
+		
+
 		//Add items to the list............................................................................
 		list = new JList();
 		DefaultListModel listOfProcessesModel=new DefaultListModel();
-		
 		for(int i=0;i<numberOfProcesses;i++){
 			listOfProcessesModel.addElement("Process "+ (i+1));
 		}
-		
 		list.setModel(listOfProcessesModel);
 		list.setVisible(true);
 		
@@ -138,13 +83,12 @@ public class MMUView extends Observable implements View {
 		btnPlay.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent arg0) {
-				//System.out.println(list.getSelectedIndices());
-				updateActiveProcesses(list.getSelectedIndices());
 				
-				executeNextCommand();
+				//updateActiveProcesses(list.getSelectedIndices());
 				
-				//list.getSelectionModel()
-				//-1 fir each selected process.
+				//executeNextCommand();
+				
+				
 			}
 
 			
@@ -161,7 +105,7 @@ public class MMUView extends Observable implements View {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("In play all: ");
-				executeAllCommands();
+				//executeAllCommands();
 				System.out.println(list.getSelectionModel());
 				
 			}
@@ -230,22 +174,24 @@ public class MMUView extends Observable implements View {
 		table = new JTable(tableModel);
 	
 		for(int i=0;i<capacitySize;i++){
-			freeColuumns.add(i);
+			freeColumns.add(i);
 		}
 		
 		table.setModel(tableModel);
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(10, 11, 312, 86);
+		
 		frmMmuSimulator.getContentPane().add(scrollPane);
-		
-		
 		frmMmuSimulator.setVisible(true);
+		System.out.println(rowsFromLog);
 	}
 	
 	public void setParameters(Object arg1) {
 		rowsFromLog=(List<String>) arg1;
 		setPageFaults(0);
 		setPageReplacements(0);
+		
+		
 		setCapacitySize(Character.getNumericValue((rowsFromLog.get(0).charAt(3))));
 		setNumberOfProcesses(Character.getNumericValue((rowsFromLog.get(1).charAt(3))));
 		activeProcesses=new HashSet();
@@ -255,125 +201,9 @@ public class MMUView extends Observable implements View {
 	
 	
 	
-	protected void updatePageReplacement() {
-		setPageReplacements(pageReplacements+1);
-		getEditorPanePageReplacement().setText(getPageReplacements().toString());
-		
-	}
-
-	protected void updatePageFault() {
-		setPageFaults(pageFaults+1);
-		getEditorPanePageFault().setText(getPageFaults().toString());
-	}
-
-	protected void executeAllCommands() {
-		for(int i=0;i<rowsFromLog.size();i++){
-			executeNextCommand();
-		}
-	}
-
-	protected void executeNextCommand() {
-		currentCommand=new String(rowsFromLog.get(rowsFromLogIndex));
-		if(currentCommand.contains("PF")){
-			updatePageFault();
-		}
-		else if(currentCommand.contains("PR")){
-			
-			//Find the next GetPageIndex();
-			//Find the col to replace();
-			//
-			/*
-			updatePageReplacement();
-			updateActiveProcesses(getListOfProcesses().getSelectedIndices());
-			if(activeProcesses.contains(Character.getNumericValue(currentCommand.charAt(4)))){
-				System.out.println("Col: "+temp);
-				setTheWholeColumn(temp);
-			//Switch with pageIndex();
-			 */
-			//Not ready yet.
-		}
-		else if(currentCommand.contains("GP") && true){
-			//(chechIfPageInTable(Character.getNumericValue(currentCommand.charAt(4))))
-			updateActiveProcesses(getListOfProcesses().getSelectedIndices());
-			if(activeProcesses.contains(Character.getNumericValue(currentCommand.charAt(4)))){
-				int temp=getNextFreeCol();
-				//System.out.println("Col: "+temp);
-				setTheWholeColumn(temp);
-			}
-		}
-		
-		
-		rowsFromLogIndex++;
-		
-	}
-
-	private boolean chechIfPageInTable(int numericValue) {
-		Enumeration<TableColumn> tempEnum=getTable().getTableHeader().getColumnModel().getColumns();
-		while(tempEnum.hasMoreElements()){
-			if((int)tempEnum.nextElement().getHeaderValue()==numericValue){
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private int getNextFreeCol() {
-		int temp=0;
-		
-		if(freeColuumns.size()>0){
-			temp=(int) freeColuumns.get(0);
-			freeColuumns.remove(0);
-		}
-		
-		return temp;
-		
-	}
-
-	private void setTheWholeColumn(int ColToEdit) {
-		ArrayList temp=getPageValues(rowsFromLogIndex);
-		
-		getTable().getTableHeader().getColumnModel().getColumn(ColToEdit).setHeaderValue(getPageNumberOnGP());
-		table.getTableHeader().repaint();
-		
-		for(int i=0;i<sizeOfPage;i++){
-			tableModel.setValueAt(temp.get(i).toString(),i, ColToEdit);
-		}
-		table.setModel(tableModel);
-		table.repaint();
-	}
-
-	private String getPageNumberOnGP() {
-		return (rowsFromLog.get(rowsFromLogIndex).substring(5, rowsFromLog.get(rowsFromLogIndex).indexOf("[")).replace(" ",""));
-	}
-
-	private ArrayList getPageValues(int commandIndex) {
-		ArrayList returnedArray=new ArrayList();
-		String[] tempString=rowsFromLog.get(commandIndex).substring(9).replace("]","").replace(",","").split(" ");
-		for(int i=0;i<sizeOfPage;i++){
-			returnedArray.add(Integer.parseInt(tempString[i]));
-		}
-		return (returnedArray);
-	}
-
-	protected void updateActiveProcesses(int[] active) {
-		activeProcesses.clear();
-		for (int i=0;i<active.length;i++) {
-			activeProcesses.add(active[i]+1);
-		}
-		//System.out.println(activeProcesses);
-	}
-	protected JEditorPane getEditorPanePageFault() {
-		return editorPane;
-	}
-	protected JEditorPane getEditorPanePageReplacement() {
-		return editorPane_1;
-	}
-	public JList getListOfProcesses() {
-		return list;
-	}
-	protected JTable getTable() {
-		return table;
-	}
+	
+	
+	
 	
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	public void initialized(){
@@ -399,7 +229,7 @@ public class MMUView extends Observable implements View {
 		
 	}
 
-	public Integer getPageFaults() {
+	public int getPageFaults() {
 		return pageFaults;
 	}
 
@@ -407,7 +237,7 @@ public class MMUView extends Observable implements View {
 		this.pageFaults = pageFaults;
 	}
 
-	public Integer getPageReplacements() {
+	public int getPageReplacements() {
 		return pageReplacements;
 	}
 
@@ -430,5 +260,9 @@ public class MMUView extends Observable implements View {
 	public void setNumberOfProcesses(int numberOfProcesses) {
 		this.numberOfProcesses = numberOfProcesses;
 	}
+
+	
+
+	
 
 }

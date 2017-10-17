@@ -34,6 +34,7 @@ public class MMUModel extends Observable implements Model{
 		//MMUDriver.start();
 		rowsFromLog=new ArrayList<>();
 		
+		
 	}
 	
 	public void setCommands(String[] inputCommand){
@@ -70,7 +71,6 @@ public class MMUModel extends Observable implements Model{
 
 	@Override
 	public void start() {
-		int[] parametersForMMUView=new int[2];
 		MemoryManagementUnit mmu = new MemoryManagementUnit(capacityForAlgo, algoToExe);
 		RunConfiguration runConfiguration = MMUDriver.readConfigurationFile();
 		List<ProcessCycles> processCycles = runConfiguration.getProcessCycles();
@@ -92,7 +92,7 @@ public class MMUModel extends Observable implements Model{
 			e.printStackTrace();
 		}
 		
-		
+		readAllLog();
 		setChanged();
 		notifyObservers(rowsFromLog);
 		
